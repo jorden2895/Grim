@@ -627,7 +627,7 @@ public class CheckManagerListener extends PacketListenerAbstract {
         //
         // removed a large rant, but I'm keeping this out of context insult below
         // EVEN A BUNCH OF MONKEYS ON A TYPEWRITER COULDNT WRITE WORSE NETCODE THAN MOJANG
-        if (!player.packetStateData.lastPacketWasTeleport && flying.hasPositionChanged() && flying.hasRotationChanged() &&
+        if (flying.hasPositionChanged() && flying.hasRotationChanged() &&
                 // Ground status will never change in this stupidity packet
                 ((flying.isOnGround() == player.packetStateData.packetPlayerOnGround
                         // Mojang added this stupid mechanic in 1.17

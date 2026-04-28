@@ -18,7 +18,7 @@ public class MultiActionsC extends Check implements PacketCheck {
         super(player);
     }
 
-    // TODO: move this to a bett spot? not sure where to put this
+    // TODO: move this to a better spot? not sure where to put this
     @Contract(pure = true)
     public static String getVerbose(@NotNull GrimPlayer player) {
         StringJoiner verbose = new StringJoiner(", ");

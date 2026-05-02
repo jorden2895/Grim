@@ -15,6 +15,6 @@ public class PacketEntityShulker extends PacketEntity {
 
     @Override
     public double clampScale(double scale) {
-        return Math.max(scale, 3);
+        return Math.min(scale, 3);
     }
 }

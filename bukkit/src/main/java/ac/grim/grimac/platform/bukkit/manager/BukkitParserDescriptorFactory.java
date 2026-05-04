@@ -5,7 +5,6 @@ import ac.grim.grimac.platform.api.manager.cloud.CloudCommandAdapter;
 import ac.grim.grimac.platform.api.sender.Sender;
 import ac.grim.grimac.platform.bukkit.command.BukkitPlayerSelectorParser;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.bukkit.BukkitCommandContextKeys;
 import org.incendo.cloud.parser.ParserDescriptor;

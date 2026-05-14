@@ -22,8 +22,10 @@ Punishments:
       - "NoFall"
     # Threshold:Interval Command
     #
-    # Fires on flag N, then every M flags after — i.e. at flags N, N+M, N+2M, ...
-    # An interval of 0 means execute exactly once when the threshold is reached.
+    # N is the active violation count required to run the command.
+    # Active violations are counted inside the remove-violations-after window.
+    # M > 0 runs at N, then N+M, N+2M, ...
+    # M = 0 runs once when N is reached.
     #
     # Examples:
     # - "100:0 kick %player% incorrect movement!"   fires once on flag 100

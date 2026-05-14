@@ -130,15 +130,17 @@ public class PunishmentManager implements ConfigReloadable {
                     }
 
                     if (violationCount >= command.threshold) {
-                        // M=0: fire once per incident (resets when vc < threshold).
-                        // M>0: fire at N, N+M, N+2M, ... while vc stays >= threshold;
-                        //      reset to N when vc drops below threshold so a fresh
-                        //      climb past N alerts again.
-                        boolean inInterval = command.interval == 0
-                                ? !command.executedOnce
+                        boolean shouldRun = command.interval == 0
+                                ? command.executeCount == 0
                                 : violationCount >= command.nextBoundary;
-                        if (inInterval) {
-                            if (COMMAND_CHANNEL.fire(player, check, verbose, cmd)) continue;
+                        if (shouldRun) {
+                            boolean canceled = COMMAND_CHANNEL.fire(player, check, verbose, cmd);
+                            if (command.interval == 0) {
+                                command.executeCount++;
+                            } else {
+                                advanceBoundary(command, violationCount);
+                            }
+                            if (canceled) continue;
 
                             switch (command.command) {
                                 case "[webhook]" -> GrimAPI.INSTANCE.getDiscordManager().sendAlert(player, verbose, check.getDisplayName(), vl);
@@ -166,30 +168,23 @@ public class PunishmentManager implements ConfigReloadable {
                                         )
                                 );
                             }
-                            // Advance the cursor only on a non-canceled fire (the
-                            // CHANNEL.fire path above `continue`s on cancel, so we
-                            // never reach here when canceled — boundary stays open
-                            // and the next flag re-tries the plugin).
-                            if (command.interval == 0) {
-                                command.executedOnce = true;
-                            } else {
-                                command.nextBoundary += ((violationCount - command.nextBoundary) / command.interval + 1) * command.interval;
-                            }
                         }
 
-                        command.executeCount++;
+                        if (command.interval > 0) command.executeCount++;
                     } else {
-                        // Below this command's threshold — incident over, reset the
-                        // cursor so accruing past N again fires fresh. Per-command
-                        // (each command in the group has its own threshold).
+                        // Interval commands re-arm after the active rolling count
+                        // cools below their threshold.
                         command.nextBoundary = command.threshold;
-                        command.executedOnce = false;
                     }
                 }
             }
         }
 
         return sentDebug;
+    }
+
+    private static void advanceBoundary(ParsedCommand command, int violationCount) {
+        command.nextBoundary += ((violationCount - command.nextBoundary) / command.interval + 1) * command.interval;
     }
 
     public void handleViolation(Check check) {
@@ -225,16 +220,10 @@ class ParsedCommand {
     public final int threshold;
     public final int interval;
     public final String command;
+    // Legacy M=0 gate: execute once for this loaded command state.
     public int executeCount;
-    // Per-command incident cursor. "Incident" = while violationCount >= threshold.
-    // nextBoundary is the smallest count at which this command should fire next:
-    // starts at threshold, advances past the current count after each fire.
-    // executedOnce is the M=0 single-fire gate (replaces executeCount as a gate;
-    // executeCount is kept as a vestigial counter for back-compat).
-    // Both reset when violationCount falls back below threshold — the incident
-    // is over and the next time the player accrues past N, fire fresh.
+    // For M>0, the next active violation count that should run this command.
     public int nextBoundary;
-    public boolean executedOnce;
 
     public ParsedCommand(int threshold, int interval, String command) {
         this.threshold = threshold;

@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -84,10 +85,12 @@ import java.util.regex.PatternSyntaxException;
  * {@code countSessions} / violations count), so tab-complete never offers
  * numbers that'd error out.
  * <p>
- * Runs synchronously on the command thread — keeps RCON callers from losing
- * the reply channel mid-command.
+ * Player history reads run synchronously so RCON callers keep their reply
+ * channel. The repair subcommand schedules its database work asynchronously.
  */
 public class GrimHistory implements BuildableCommand {
+
+    private static final AtomicBoolean REPAIR_RUNNING = new AtomicBoolean();
 
     private static final int MAX_SUGGESTIONS = 30;
     private static final int MAX_PLAYER_SUGGESTIONS = 25;
@@ -487,55 +490,83 @@ public class GrimHistory implements BuildableCommand {
             return;
         }
 
-        try {
-            logBoth(sender, Component.text(
-                    "Repairing history check ids on backend '" + backendId + "'...", NamedTextColor.AQUA));
+        if (!REPAIR_RUNNING.compareAndSet(false, true)) {
+            sender.sendMessage(Component.text("A history check-id repair is already running.", NamedTextColor.YELLOW));
+            return;
+        }
 
-            int prewarmed = prewarmCatalogFromLiveChecks(lifecycle);
+        List<CheckDefinition> liveChecks = snapshotLiveCheckDefinitions();
+        logBoth(sender, Component.text(
+                "Repairing history check ids on backend '" + backendId + "' in the background...", NamedTextColor.AQUA));
+        GrimAPI.INSTANCE.getScheduler().getAsyncScheduler().runNow(
+                GrimAPI.INSTANCE.getGrimPlugin(),
+                () -> runRepairAsync(sender, lifecycle, backend, liveChecks));
+    }
+
+    private static void runRepairAsync(
+            Sender sender,
+            DataStoreLifecycle lifecycle,
+            Backend backend,
+            List<CheckDefinition> liveChecks) {
+        try {
+            int prewarmed = prewarmCatalog(lifecycle, liveChecks);
             RepairPlan plan = buildRepairPlan(backend);
             CheckCatalogRepairResult result = backend.repairCheckCatalog(
                     plan.legacyToCatalogIds(), currentGrimVersion());
-            CheckRegistry registry = lifecycle.checkRegistryForCommands();
-            if (registry != null) registry.reload();
-
-            logBoth(sender, Component.text()
-                    .append(Component.text("Repair complete: ", NamedTextColor.GREEN))
-                    .append(Component.text(prewarmed + " live check definitions prewarmed, "))
-                    .append(Component.text(result.mappingsApplied() + " id mapping(s), "))
-                    .append(Component.text(result.violationsUpdated() + " violation row(s) rewritten, "))
-                    .append(Component.text(result.catalogVersionsUpdated() + " stub version row(s) fixed"))
-                    .build());
-            if (plan.ambiguousHashes() > 0 || plan.catalogIdCollisions() > 0) {
-                logBoth(sender, Component.text()
-                        .append(Component.text("Skipped ", NamedTextColor.YELLOW))
-                        .append(Component.text(plan.ambiguousHashes() + " ambiguous hash mapping(s), "))
-                        .append(Component.text(plan.catalogIdCollisions() + " catalog-id collision(s)."))
-                        .build());
-            }
+            runOnGlobalThread(() -> reportRepairComplete(sender, prewarmed, plan, result));
         } catch (Exception e) {
-            logBoth(sender, Component.text("Repair failed: " + e.getMessage(), NamedTextColor.RED));
+            runOnGlobalThread(() -> logBoth(sender, Component.text("Repair failed: " + e.getMessage(), NamedTextColor.RED)));
             LogUtil.error("v1 check-id repair failed via /grim history repair check-ids", e);
+        } finally {
+            REPAIR_RUNNING.set(false);
         }
     }
 
-    private static int prewarmCatalogFromLiveChecks(DataStoreLifecycle lifecycle) {
-        CheckRegistry registry = lifecycle.checkRegistryForCommands();
-        if (registry == null) return 0;
-        registry.reload();
+    private static void reportRepairComplete(
+            Sender sender,
+            int prewarmed,
+            RepairPlan plan,
+            CheckCatalogRepairResult result) {
+        logBoth(sender, Component.text()
+                .append(Component.text("Repair complete: ", NamedTextColor.GREEN))
+                .append(Component.text(prewarmed + " live check definitions prewarmed, "))
+                .append(Component.text(result.mappingsApplied() + " id mapping(s), "))
+                .append(Component.text(result.violationsUpdated() + " violation row(s) rewritten, "))
+                .append(Component.text(result.catalogVersionsUpdated() + " stub version row(s) fixed"))
+                .build());
+        if (plan.ambiguousHashes() > 0 || plan.catalogIdCollisions() > 0) {
+            logBoth(sender, Component.text()
+                    .append(Component.text("Skipped ", NamedTextColor.YELLOW))
+                    .append(Component.text(plan.ambiguousHashes() + " ambiguous hash mapping(s), "))
+                    .append(Component.text(plan.catalogIdCollisions() + " catalog-id collision(s)."))
+                    .build());
+        }
+    }
 
-        int prewarmed = 0;
-        String version = currentGrimVersion();
+    private static List<CheckDefinition> snapshotLiveCheckDefinitions() {
+        List<CheckDefinition> definitions = new ArrayList<>();
         Set<String> seenStableKeys = new HashSet<>();
         for (GrimPlayer player : GrimAPI.INSTANCE.getPlayerDataManager().getEntries()) {
             for (AbstractCheck check : player.checkManager.allChecks.values()) {
                 String stableKey = check.getStableKey();
                 if (stableKey == null || stableKey.isBlank()) continue;
                 if (!seenStableKeys.add(stableKey)) continue;
-                registry.intern(stableKey, check.getCheckName(), check.getDescription(), version);
-                prewarmed++;
+                definitions.add(new CheckDefinition(stableKey, check.getCheckName(), check.getDescription()));
             }
         }
-        registry.reload();
+        return definitions;
+    }
+
+    private static int prewarmCatalog(DataStoreLifecycle lifecycle, List<CheckDefinition> definitions) {
+        CheckRegistry registry = lifecycle.checkRegistryForCommands();
+        if (registry == null) return 0;
+
+        int prewarmed = 0;
+        String version = currentGrimVersion();
+        for (CheckDefinition definition : definitions) {
+            registry.intern(definition.stableKey(), definition.display(), definition.description(), version);
+            prewarmed++;
+        }
         return prewarmed;
     }
 
@@ -576,6 +607,13 @@ public class GrimHistory implements BuildableCommand {
             Map<Integer, Integer> legacyToCatalogIds,
             int ambiguousHashes,
             int catalogIdCollisions) {}
+
+    private record CheckDefinition(String stableKey, String display, String description) {}
+
+    private static void runOnGlobalThread(Runnable task) {
+        GrimAPI.INSTANCE.getScheduler().getGlobalRegionScheduler().run(
+                GrimAPI.INSTANCE.getGrimPlugin(), task);
+    }
 
     private static void logBoth(Sender sender, Component msg) {
         sender.sendMessage(msg);

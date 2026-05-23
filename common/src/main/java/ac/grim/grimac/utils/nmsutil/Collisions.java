@@ -470,20 +470,20 @@ public final class Collisions {
     public static void onInsideBlock(GrimPlayer player, Vector3dm clientVelocity, boolean onlyApplyVelocity, StateType blockType, WrappedBlockState block, int blockX, int blockY, int blockZ, boolean magic) {
         if (!onlyApplyVelocity && blockType == StateTypes.COBWEB) {
             if (player.compensatedEntities.hasPotionEffect(PotionTypes.WEAVING)) {
-                player.stuckSpeedMultiplier = new Vector3dm(0.5, 0.25, 0.5);
+                player.stuckSpeedMultiplier = new Vector3d(0.5, 0.25, 0.5);
             } else {
-                player.stuckSpeedMultiplier = new Vector3dm(0.25, 0.05f, 0.25);
+                player.stuckSpeedMultiplier = new Vector3d(0.25, 0.05f, 0.25);
             }
         }
 
         if (!onlyApplyVelocity && blockType == StateTypes.SWEET_BERRY_BUSH
                 && player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_14)) {
-            player.stuckSpeedMultiplier = new Vector3dm(0.8f, 0.75, 0.8f);
+            player.stuckSpeedMultiplier = new Vector3d(0.8f, 0.75, 0.8f);
         }
 
         if (!onlyApplyVelocity && blockType == StateTypes.POWDER_SNOW && blockX == Math.floor(player.x) && blockY == Math.floor(player.y) && blockZ == Math.floor(player.z)
                 && player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_17)) {
-            player.stuckSpeedMultiplier = new Vector3dm(0.9f, 1.5, 0.9f);
+            player.stuckSpeedMultiplier = new Vector3d(0.9f, 1.5, 0.9f);
         }
 
         if (blockType == StateTypes.SOUL_SAND && player.getClientVersion().isOlderThan(ClientVersion.V_1_15)) {
@@ -554,7 +554,7 @@ public final class Collisions {
             player.uncertaintyHandler.lastStuckSpeedMultiplier.reset();
         }
 
-        player.stuckSpeedMultiplier = new Vector3dm(1, 1, 1);
+        player.stuckSpeedMultiplier = GrimPlayer.DEFAULT_STUCK_SPEED;
         player.finalMovementsThisTick.clear();
 
         Vector3d from = new Vector3d(player.lastX, player.lastY, player.lastZ);
@@ -583,7 +583,7 @@ public final class Collisions {
 
         // Flying players are not affected by cobwebs/sweet berry bushes
         if (player.isFlying) {
-            player.stuckSpeedMultiplier = new Vector3dm(1, 1, 1);
+            player.stuckSpeedMultiplier = GrimPlayer.DEFAULT_STUCK_SPEED;
         }
     }
 

@@ -195,12 +195,12 @@ public class CompensatedWorld implements PacketWorld {
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
             // Pull the confirmation ID out of the packet
             int confirmationId = 0;
-            if (wrapper instanceof WrapperPlayClientPlayerBlockPlacement) {
-                confirmationId = ((WrapperPlayClientPlayerBlockPlacement) wrapper).getSequence();
-            } else if (wrapper instanceof WrapperPlayClientUseItem) {
-                confirmationId = ((WrapperPlayClientUseItem) wrapper).getSequence();
-            } else if (wrapper instanceof WrapperPlayClientPlayerDigging) {
-                confirmationId = ((WrapperPlayClientPlayerDigging) wrapper).getSequence();
+            if (wrapper instanceof WrapperPlayClientPlayerBlockPlacement playerBlockPlacement) {
+                confirmationId = playerBlockPlacement.getSequence();
+            } else if (wrapper instanceof WrapperPlayClientUseItem useItem) {
+                confirmationId = useItem.getSequence();
+            } else if (wrapper instanceof WrapperPlayClientPlayerDigging playerDigging) {
+                confirmationId = playerDigging.getSequence();
             }
 
             serverIsCurrentlyProcessingThesePredictions.put(confirmationId, toApplyBlocks);

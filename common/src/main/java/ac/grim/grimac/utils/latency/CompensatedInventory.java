@@ -32,6 +32,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOp
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPlayerInventory;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
@@ -58,11 +59,8 @@ public class CompensatedInventory extends Check implements PacketCheck {
 
     // The item held at the start of the current client tick (processed at the end of the previous tick)
     // Currently only used by 1.21.11+ players to handle attribute swapping items with the ATTACK_RANGE Component
+    @Getter
     private ItemStack startOfTickStack = ItemStack.EMPTY;
-
-    public ItemStack getStartOfTickStack() {
-        return startOfTickStack;
-    }
 
     public CompensatedInventory(GrimPlayer playerData) {
         super(playerData);

@@ -312,7 +312,7 @@ public class CompensatedInventory extends Check implements PacketCheck {
             }
         } else if (event.getPacketType() == PacketType.Play.Client.CLOSE_WINDOW) {
             this.closeActiveInventory();
-        } else if (event.getPacketType() == PacketType.Play.Client.CLIENT_TICK_END) {
+        } else if (isTickPacket(event.getPacketType())) {
             this.startOfTickStack = getHeldItem();
         }
     }

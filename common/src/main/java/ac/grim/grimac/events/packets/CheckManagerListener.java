@@ -604,6 +604,7 @@ public class CheckManagerListener extends PacketListenerAbstract {
 
         final PacketTypeCommon packetType = event.getPacketType();
         if (packetType == PacketType.Play.Server.OPEN_WINDOW || packetType == PacketType.Play.Server.OPEN_HORSE_WINDOW) {
+            player.sendTransaction();
             player.latencyUtils.addRealTimeTask(player.lastTransactionSent.get(), () -> player.serverOpenedInventoryThisTick = true);
         }
 

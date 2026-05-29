@@ -298,44 +298,36 @@ public class CheckManager {
         init();
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends AbstractCheck> T getCheck(Class<T> check) {
-        return (T) allChecks.get(check);
+        return allChecks.getInstance(check);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends PositionCheck> T getPositionCheck(Class<T> check) {
-        return (T) positionChecks.get(check);
+        return positionChecks.getInstance(check);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends RotationCheck> T getRotationCheck(Class<T> check) {
-        return (T) rotationChecks.get(check);
+        return rotationChecks.getInstance(check);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends BlockPlaceCheck> T getBlockPlaceCheck(Class<T> check) {
-        return (T) blockPlaceChecks.get(check);
+        return blockPlaceChecks.getInstance(check);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends PacketCheck> T getPacketCheck(Class<T> check) {
-        return (T) packetChecks.get(check);
+        return packetChecks.getInstance(check);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends PacketCheck> T getPreViaPacketCheck(Class<T> check) {
-        return (T) preViaPacketChecks.get(check);
+        return preViaPacketChecks.getInstance(check);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends PacketCheck> T getPrePredictionCheck(Class<T> check) {
-        return (T) prePredictionChecks.get(check);
+        return prePredictionChecks.getInstance(check);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends PostPredictionCheck> T getPostPredictionCheck(Class<T> check) {
-        return (T) postPredictionChecks.get(check);
+        return postPredictionChecks.getInstance(check);
     }
 
     public void onPrePredictionReceivePacket(final PacketReceiveEvent packet) {

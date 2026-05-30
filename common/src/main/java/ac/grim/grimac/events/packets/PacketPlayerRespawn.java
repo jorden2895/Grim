@@ -223,7 +223,9 @@ public class PacketPlayerRespawn extends PacketListenerAbstract {
                     player.compensatedEntities.hasSprintingAttributeEnabled = false;
                 }
                 player.pose = Pose.STANDING;
-                player.clientVelocity = new Vector3dm();
+                if (!keepTrackedData || player.getClientVersion().isOlderThan(ClientVersion.V_1_21_2)) {
+                    player.clientVelocity = new Vector3dm();
+                }
                 if (!GrimAPI.INSTANCE.getSpectateManager().isSpectating(player.uuid)) {
                     player.gamemode = respawn.getGameMode();
                 }

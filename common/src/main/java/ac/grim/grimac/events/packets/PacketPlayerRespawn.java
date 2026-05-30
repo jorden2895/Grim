@@ -10,7 +10,6 @@ import ac.grim.grimac.utils.data.TrackerData;
 import ac.grim.grimac.utils.data.packetentity.PacketEntitySelf;
 import ac.grim.grimac.utils.enums.Pose;
 import ac.grim.grimac.utils.math.Vector3dm;
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
@@ -48,25 +47,25 @@ public class PacketPlayerRespawn extends PacketListenerAbstract {
 
     private static final byte KEEP_ATTRIBUTES = 1;
     private static final byte KEEP_TRACKED_DATA = 2;
-    private static final byte KEEP_ALL = 3;
 
     public PacketPlayerRespawn() {
         super(PacketListenerPriority.HIGH);
     }
 
-    private boolean hasFlag(WrapperPlayServerRespawn respawn, byte flag) {
-        // This packet was added in 1.16
+    @Override
+    public boolean isPreVia() {
+        return true;
+    }
+
+    private boolean hasFlag(ClientVersion version, WrapperPlayServerRespawn respawn, byte flag) {
         if (flag == KEEP_ATTRIBUTES) {
-            // On versions older than 1.15, via does not keep all attributes.
-            // https://github.com/ViaVersion/ViaVersion/blob/master/common/src/main/java/com/viaversion/viaversion/protocols/v1_15_2to1_16/rewriter/EntityPacketRewriter1_16.java#L124
-            if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_15)) {
+            if (version.isOlderThan(ClientVersion.V_1_15)) {
                 return false;
-            }
-        } else if (flag == KEEP_TRACKED_DATA) {
-            // But for metadata, via DOES keep all data
-            if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_15)) {
+            } else if (version.isOlderThan(ClientVersion.V_1_16)) {
                 return true;
             }
+        } else if (flag == KEEP_TRACKED_DATA && version.isOlderThan(ClientVersion.V_1_19_3)) {
+            return true;
         }
 
         return (respawn.getKeptData() & flag) != 0;
@@ -83,7 +82,7 @@ public class PacketPlayerRespawn extends PacketListenerAbstract {
             if (player.packetStateData.lastFood == health.getFood()
                     && player.packetStateData.lastHealth == health.getHealth()
                     && player.packetStateData.lastSaturation == health.getFoodSaturation()
-                    && PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_9))
+                    && event.getServerVersion().isOlderThan(ServerVersion.V_1_9))
                 return;
 
             player.packetStateData.lastFood = health.getFood();
@@ -120,12 +119,11 @@ public class PacketPlayerRespawn extends PacketListenerAbstract {
             player.dimensionType = joinGame.getDimensionType();
             player.worldName = joinGame.getWorldName();
 
-            if (player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_15)
-                    && event.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_15)) {
+            if (player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_15)) {
                 player.packetStateData.showsDeathScreen = joinGame.isRespawnScreenEnabled();
             }
 
-            if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_17))
+            if (player.getClientVersion().isOlderThan(ClientVersion.V_1_17))
                 return;
             player.compensatedWorld.setDimension(joinGame.getDimensionType(), event.getUser());
         }
@@ -169,7 +167,7 @@ public class PacketPlayerRespawn extends PacketListenerAbstract {
 
                 player.checkManager.getPreViaPacketCheck(BadPacketsM.class).onRespawn();
 
-                final boolean keepTrackedData = this.hasFlag(respawn, KEEP_TRACKED_DATA);
+                final boolean keepTrackedData = this.hasFlag(player.getClientVersion(), respawn, KEEP_TRACKED_DATA);
 
                 if (!keepTrackedData) {
                     player.food = 20;
@@ -229,11 +227,11 @@ public class PacketPlayerRespawn extends PacketListenerAbstract {
                 if (!GrimAPI.INSTANCE.getSpectateManager().isSpectating(player.uuid)) {
                     player.gamemode = respawn.getGameMode();
                 }
-                if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
+                if (event.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
                     player.compensatedWorld.setDimension(respawn.getDimensionType(), event.getUser());
                 }
 
-                if (player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_16) && !this.hasFlag(respawn, KEEP_ATTRIBUTES)) {
+                if (player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_16) && !this.hasFlag(player.getClientVersion(), respawn, KEEP_ATTRIBUTES)) {
                     // Reset attributes if not kept
                     player.compensatedEntities.self.resetAttributes();
                     player.compensatedEntities.hasSprintingAttributeEnabled = false;
@@ -243,11 +241,11 @@ public class PacketPlayerRespawn extends PacketListenerAbstract {
     }
 
     private boolean isWorldChange(GrimPlayer player, WrapperPlayServerRespawn respawn) {
-        if (player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_16) && PacketEvents.getAPI().getServerManager().getVersion().isNewerThan(ServerVersion.V_1_16)) {
+        if (player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_16)) {
             return !Objects.equals(respawn.getWorldName().orElse(null), player.worldName);
         }
 
-        ClientVersion version = PacketEvents.getAPI().getServerManager().getVersion().toClientVersion();
+        ClientVersion version = player.getClientVersion();
         return respawn.getDimensionType().getId(version) != player.dimensionType.getId(version)
                 || !Objects.equals(respawn.getDimensionType().getName(), player.dimensionType.getName());
     }

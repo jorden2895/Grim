@@ -5,7 +5,9 @@ val fabric_version: String by project
 
 plugins {
     `maven-publish`
-    alias(libs.plugins.fabric.loom.unobfuscated)
+    // No version: loom is already on the classpath from the parent :fabric project,
+    // so a version request here would fail compatibility checking.
+    id("net.fabricmc.fabric-loom")
     grim.`base-conventions`
     grim.`jij-conventions`
 }
@@ -34,7 +36,7 @@ dependencies {
     compileOnly("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
     implementation(project(":common"))
-    implementation(project(":fabric-common"))
+    implementation(project(":fabric:shared"))
     compileOnly(libs.packetevents.api)
     compileOnly(libs.packetevents.fabric)
     compileOnly("org.slf4j:slf4j-api:2.0.17")
@@ -105,7 +107,7 @@ allprojects {
             .configureEach { enabled = false }
 
         jar {
-            archiveBaseName = if (project == project(":fabric-official")) {
+            archiveBaseName = if (project == project(":fabric:official")) {
                 "${rootProject.name}-fabric-official"
             } else {
                 "${rootProject.name}-fabric-${project.name}"
@@ -117,9 +119,9 @@ allprojects {
 
 subprojects {
     dependencies {
-        implementation(project(":fabric-official"))
+        implementation(project(":fabric:official"))
         compileOnly(project(":common"))
-        compileOnly(project(":fabric-common"))
+        compileOnly(project(":fabric:shared"))
         val libsx = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
         compileOnly(libsx.findLibrary("packetevents-api").get())
         compileOnly(libsx.findLibrary("packetevents-fabric").get())

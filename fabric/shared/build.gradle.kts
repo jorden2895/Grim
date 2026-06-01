@@ -1,4 +1,6 @@
-// Shared code between intermediary and official, no NMS
+// Shared Fabric platform code for the intermediary + official variants (no NMS).
+// Named "shared" (not "common") so its Gradle capability and nested-jar filename do not
+// collide with the top-level cross-platform :common module.
 
 plugins {
     `java-library`

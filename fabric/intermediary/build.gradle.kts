@@ -6,7 +6,9 @@ val fabric_version: String by project
 
 plugins {
     `maven-publish`
-    alias(libs.plugins.fabric.loom.remap)
+    // No version: loom is already on the classpath from the parent :fabric project,
+    // so a version request here would fail compatibility checking.
+    id("net.fabricmc.fabric-loom-remap")
     grim.`base-conventions`
     grim.`jij-conventions`
 }
@@ -22,7 +24,7 @@ dependencies {
     modImplementation(libs.fabric.loader)
 
     // NMS-free Fabric platform code shared with fabric-official lives here.
-    implementation(project(":fabric-common"))
+    implementation(project(":fabric:shared"))
     // PE is JiJ'd once at the fabric/ aggregator; compileOnly here avoids re-nesting it.
     compileOnly(libs.packetevents.fabric)
     compileOnly("org.slf4j:slf4j-api:2.0.17")
@@ -107,7 +109,7 @@ allprojects {
 
     tasks {
         remapJar {
-            archiveBaseName = if (project == project(":fabric-intermediary")) {
+            archiveBaseName = if (project == project(":fabric:intermediary")) {
                 "${rootProject.name}-fabric-intermediary"
             } else {
                 "${rootProject.name}-fabric-${project.name}"
@@ -116,7 +118,7 @@ allprojects {
         }
 
         remapSourcesJar {
-            archiveBaseName = if (project == project(":fabric-intermediary")) {
+            archiveBaseName = if (project == project(":fabric:intermediary")) {
                 "${rootProject.name}-fabric-intermediary"
             } else {
                 "${rootProject.name}-fabric-${project.name}"
@@ -129,10 +131,10 @@ allprojects {
 subprojects {
     dependencies {
         // configuration = "namedElements" required when depending on another loom project
-        implementation(project(":fabric-intermediary", configuration = "namedElements"))
+        implementation(project(":fabric:intermediary", configuration = "namedElements"))
         // Shared NMS-free Fabric code (e.g. FabricFutureUtil) lives in fabric-common;
         // the per-version submodules reference it, so it must be on their compile path.
-        compileOnly(project(":fabric-common"))
+        compileOnly(project(":fabric:shared"))
         // PE is JiJ'd at fabric/ (aggregator); per-version submodules just need it on
         // the compile classpath. compileOnly avoids re-nesting PE inside each mcXXXX jar.
         val libsx = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")

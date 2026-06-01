@@ -27,9 +27,9 @@ repositories {
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft_version")
 
-    include(project(":fabric-common"))
-    include(project(":fabric-intermediary"))
-    include(project(":fabric-official"))
+    include(project(":fabric:shared"))
+    include(project(":fabric:intermediary"))
+    include(project(":fabric:official"))
     include(libs.packetevents.fabric)
 }
 

@@ -43,11 +43,9 @@ repositories {
 
 
 dependencies {
-    if (BuildConfig.shadePE) {
-        api(libs.packetevents.api)
-    } else {
-        compileOnly(libs.packetevents.api)
-    }
+    // compileOnly, not api: each platform bundles PE via its own JiJ/shade path,
+    // so api() here would nest packetevents-api a second time (~4.2MB) in the jars.
+    compileOnly(libs.packetevents.api)
     api(libs.cloud.core)
     api(libs.cloud.processors.requirements)
     api(libs.configuralize) {

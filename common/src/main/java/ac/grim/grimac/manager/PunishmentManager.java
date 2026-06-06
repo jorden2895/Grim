@@ -6,6 +6,7 @@ import ac.grim.grimac.api.config.ConfigManager;
 import ac.grim.grimac.api.config.ConfigReloadable;
 import ac.grim.grimac.api.event.events.CommandExecuteEvent;
 import ac.grim.grimac.checks.Check;
+import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.events.packets.ProxyAlertMessenger;
 import ac.grim.grimac.platform.api.player.PlatformPlayer;
 import ac.grim.grimac.player.GrimPlayer;
@@ -145,9 +146,12 @@ public class PunishmentManager implements ConfigReloadable {
                             switch (command.command) {
                                 case "[webhook]" -> GrimAPI.INSTANCE.getDiscordManager().sendAlert(player, verbose, check.getDisplayName(), vl);
                                 case "[log]" -> {
-                                    String verboseWithoutGl = verbose.replaceAll(" /gl .*", "");
-                                    GrimAPI.INSTANCE.getDataStoreLifecycle().liveWriteHooks()
-                                            .recordFlagFromCheck(player, check, vl, verboseWithoutGl);
+                                    // Binary-verbose checks store from flag(VerboseBuf); avoid an extra legacy text row.
+                                    if (!usesStructuredVerbose(check)) {
+                                        String verboseWithoutGl = verbose.replaceAll(" /gl .*", "");
+                                        GrimAPI.INSTANCE.getDataStoreLifecycle().liveWriteHooks()
+                                                .recordFlagFromCheck(player, check, vl, verboseWithoutGl);
+                                    }
                                 }
                                 case "[proxy]" -> ProxyAlertMessenger.sendPluginMessage(cmd);
                                 case "[alert]" -> {
@@ -181,6 +185,11 @@ public class PunishmentManager implements ConfigReloadable {
         }
 
         return sentDebug;
+    }
+
+    private static boolean usesStructuredVerbose(Check check) {
+        CheckData data = check.getClass().getAnnotation(CheckData.class);
+        return data != null && data.verboseVersion() >= 0;
     }
 
     private static void advanceBoundary(ParsedCommand command, int violationCount) {

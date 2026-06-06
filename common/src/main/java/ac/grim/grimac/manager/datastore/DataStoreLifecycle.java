@@ -5,6 +5,8 @@ import ac.grim.grimac.api.plugin.GrimPlugin;
 import ac.grim.grimac.checks.Check;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.impl.badpackets.BadPacketsR;
+import ac.grim.grimac.checks.impl.prediction.GroundSpoof;
+import ac.grim.grimac.checks.impl.prediction.OffsetHandler;
 import ac.grim.grimac.manager.init.start.StartableInitable;
 import ac.grim.grimac.manager.init.stop.StoppableInitable;
 import ac.grim.grimac.api.storage.DataStore;
@@ -342,6 +344,8 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
                 checkRegistry,
                 VerboseManifest.FLAVOR_V2_PUBLIC);
         registerVerboseSchema(registry, BadPacketsR.class, BadPacketsR.V);
+        registerVerboseSchema(registry, OffsetHandler.class, OffsetHandler.V);
+        registerVerboseSchema(registry, GroundSpoof.class, GroundSpoof.V);
         return registry;
     }
 

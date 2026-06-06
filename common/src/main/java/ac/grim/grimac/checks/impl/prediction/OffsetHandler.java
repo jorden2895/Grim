@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @CheckData(name = "Simulation", stableKey = "grim.prediction.simulation", verboseVersion = 1, decay = 0.02)
 public class OffsetHandler extends Check implements PostPredictionCheck {
-    public static final VerboseSchema V = VerboseSchema.of("offset:f32");
+    public static final VerboseSchema V = VerboseSchema.of("offset:f64");
 
     private static final AtomicInteger flags = new AtomicInteger(0);
     // Config
@@ -46,20 +46,9 @@ public class OffsetHandler extends Check implements PostPredictionCheck {
             synchronized (flags) {
                 int flagId = (flags.get() & 255) + 1; // 1-256 as possible values
 
-                String humanFormattedOffset;
-                if (offset < 0.001) { // 1.129E-3
-                    humanFormattedOffset = String.format("%.4E", offset);
-                    // Squeeze out an extra digit here by E-03 to E-3
-                    humanFormattedOffset = humanFormattedOffset.replace("E-0", "E-");
-                } else {
-                    // 0.00112945678 -> .001129
-                    humanFormattedOffset = String.format("%6f", offset);
-                    // I like the leading zero, but removing it lets us add another digit to the end
-                    humanFormattedOffset = humanFormattedOffset.replace("0.", ".");
-                }
-
+                String humanFormattedOffset = humanFormattedOffset(offset);
                 String verbose = humanFormattedOffset + " /gl " + flagId;
-                if (flag(V.write(verbose()).f32((float) offset))) {
+                if (flag(V.write(verbose()).f64(offset))) {
                     if (alert(verbose)) {
                         flags.incrementAndGet(); // This debug was sent somewhere
                         predictionComplete.setIdentifier(flagId);
@@ -79,6 +68,21 @@ public class OffsetHandler extends Check implements PostPredictionCheck {
         }
 
         removeOffsetLenience();
+    }
+
+    public static String humanFormattedOffset(double offset) {
+        String humanFormattedOffset;
+        if (offset < 0.001) { // 1.129E-3
+            humanFormattedOffset = String.format("%.4E", offset);
+            // Squeeze out an extra digit here by E-03 to E-3
+            humanFormattedOffset = humanFormattedOffset.replace("E-0", "E-");
+        } else {
+            // 0.00112945678 -> .001129
+            humanFormattedOffset = String.format("%6f", offset);
+            // I like the leading zero, but removing it lets us add another digit to the end
+            humanFormattedOffset = humanFormattedOffset.replace("0.", ".");
+        }
+        return humanFormattedOffset;
     }
 
     private void giveOffsetLenienceNextTick(double offset) {

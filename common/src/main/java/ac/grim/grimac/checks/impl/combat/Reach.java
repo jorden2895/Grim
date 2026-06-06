@@ -57,7 +57,7 @@ import java.util.List;
 // You may not copy the check unless you are licensed under GPL
 @CheckData(name = "Reach", stableKey = "grim.combat.reach", verboseVersion = 1, setback = 10)
 public class Reach extends Check implements PacketCheck {
-    public static final VerboseSchema V = VerboseSchema.of("reach:f32");
+    public static final VerboseSchema V = VerboseSchema.of("reach:f64", "entity:vi");
 
     private static final List<EntityType> blacklisted = Arrays.asList(
             EntityTypes.BOAT,
@@ -238,7 +238,7 @@ public class Reach extends Check implements PacketCheck {
                     if (reachEntity instanceof PacketEntitySizeable sizeable) {
                         added += ", size=" + sizeable.size;
                     }
-                    if (flag(V.write(verbose()).f32((float) result.minDistance()))) {
+                    if (flag(V.write(verbose()).f64(result.minDistance()).vi(reachEntity.getType().getId(player.getClientVersion())))) {
                         alert(result.verbose() + added);
                     }
                 }

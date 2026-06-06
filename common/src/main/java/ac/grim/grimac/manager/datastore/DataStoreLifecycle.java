@@ -27,7 +27,11 @@ import ac.grim.grimac.api.storage.identity.NameResolverLink;
 import ac.grim.grimac.api.storage.registry.MigrationContext;
 import ac.grim.grimac.api.storage.registry.StoreId;
 import ac.grim.grimac.api.storage.submit.ViolationSink;
+import ac.grim.grimac.api.storage.verbose.VerboseBuf;
+import ac.grim.grimac.api.storage.verbose.VerboseFormatter;
+import ac.grim.grimac.api.storage.verbose.VerboseRenderContext;
 import ac.grim.grimac.api.storage.verbose.VerboseSchema;
+import ac.grim.grimac.api.storage.verbose.VerboseSink;
 import ac.grim.grimac.internal.storage.backend.mongo.MongoBackendConfig;
 import ac.grim.grimac.internal.storage.backend.mongo.v2.MongoBackendV2;
 import ac.grim.grimac.internal.storage.backend.mongo.v2.MongoMigrationContext;
@@ -61,6 +65,9 @@ import ac.grim.grimac.internal.storage.submit.ViolationSinkImpl;
 import ac.grim.grimac.internal.storage.verbose.VerboseManifest;
 import ac.grim.grimac.internal.storage.verbose.VerboseRegistry;
 import ac.grim.grimac.internal.storage.verbose.VerboseRegistryImpl;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.mongodb.client.MongoDatabase;
 import org.bson.BsonBinarySubType;
 import org.bson.Document;
@@ -346,9 +353,93 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
                 VerboseManifest.FLAVOR_V2_PUBLIC);
         registerVerboseSchema(registry, BadPacketsR.class, BadPacketsR.V);
         registerVerboseSchema(registry, OffsetHandler.class, OffsetHandler.V);
+        registerVerboseFormatter(registry, OffsetHandler.class, simulationFormatter());
         registerVerboseSchema(registry, GroundSpoof.class, GroundSpoof.V);
+        registerVerboseFormatter(registry, GroundSpoof.class, groundSpoofFormatter());
         registerVerboseSchema(registry, Reach.class, Reach.V);
+        registerVerboseFormatter(registry, Reach.class, reachFormatter());
         return registry;
+    }
+
+    private static @NotNull VerboseFormatter simulationFormatter() {
+        return new VerboseFormatter() {
+            @Override
+            public int version() {
+                return OffsetHandler.V.version();
+            }
+
+            @Override
+            public void render(
+                    @NotNull VerboseBuf in,
+                    @NotNull VerboseRenderContext ctx,
+                    @NotNull VerboseSink out) {
+                out.text(OffsetHandler.humanFormattedOffset(in.rf64()));
+            }
+        };
+    }
+
+    private static @NotNull VerboseFormatter groundSpoofFormatter() {
+        return new VerboseFormatter() {
+            @Override
+            public int version() {
+                return GroundSpoof.V.version();
+            }
+
+            @Override
+            public void render(
+                    @NotNull VerboseBuf in,
+                    @NotNull VerboseRenderContext ctx,
+                    @NotNull VerboseSink out) {
+                out.text("claimed ").bool(in.rbool());
+            }
+        };
+    }
+
+    private static @NotNull VerboseFormatter reachFormatter() {
+        return new VerboseFormatter() {
+            @Override
+            public int version() {
+                return Reach.V.version();
+            }
+
+            @Override
+            public void render(
+                    @NotNull VerboseBuf in,
+                    @NotNull VerboseRenderContext ctx,
+                    @NotNull VerboseSink out) {
+                double reach = in.rf64();
+                int entityId = in.rvi();
+                out.text(String.format("%.5f", reach))
+                        .text(" blocks")
+                        .text(", type=")
+                        .text(resolveEntityName(ctx.clientVersionPvn(), entityId));
+            }
+        };
+    }
+
+    private static @NotNull String resolveEntityName(int clientVersionPvn, int entityId) {
+        EntityType entityType = EntityTypes.getById(ClientVersion.getById(clientVersionPvn), entityId);
+        return entityType == null ? "unknown" : entityType.getName().getKey();
+    }
+
+    private void registerVerboseFormatter(
+            @NotNull VerboseRegistry registry,
+            @NotNull Class<? extends Check> checkClass,
+            @NotNull VerboseFormatter formatter) {
+        CheckData data = checkClass.getAnnotation(CheckData.class);
+        if (data == null) {
+            throw new IllegalStateException(checkClass.getName() + " is missing @CheckData");
+        }
+        if (data.stableKey().isBlank()) {
+            throw new IllegalStateException(checkClass.getName() + " is missing a stableKey");
+        }
+        if (formatter.version() != data.verboseVersion()) {
+            throw new IllegalStateException(checkClass.getName() + " verbose formatter v"
+                    + formatter.version() + " does not match @CheckData verboseVersion="
+                    + data.verboseVersion());
+        }
+
+        registry.registerFormatter(data.stableKey(), formatter);
     }
 
     private void registerVerboseSchema(

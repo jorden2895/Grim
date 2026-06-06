@@ -189,7 +189,7 @@ public class PunishmentManager implements ConfigReloadable {
 
     private static boolean usesStructuredVerbose(Check check) {
         CheckData data = check.getClass().getAnnotation(CheckData.class);
-        return data != null && data.verboseVersion() >= 0;
+        return data != null && data.verboseVersion() >= 1;
     }
 
     private static void advanceBoundary(ParsedCommand command, int violationCount) {

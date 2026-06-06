@@ -360,7 +360,7 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
         if (data.stableKey().isBlank()) {
             throw new IllegalStateException(checkClass.getName() + " is missing a stableKey");
         }
-        if (data.verboseVersion() < 0) {
+        if (data.verboseVersion() < 1) {
             throw new IllegalStateException(checkClass.getName() + " is missing verboseVersion");
         }
         if (schema.version() != data.verboseVersion()) {

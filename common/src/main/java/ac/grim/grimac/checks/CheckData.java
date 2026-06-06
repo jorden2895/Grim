@@ -25,10 +25,10 @@ public @interface CheckData {
     String stableKey();
 
     /**
-     * Binary verbose schema version. Negative means the check still writes
+     * Binary verbose schema version. Zero means the check still writes
      * legacy text verbose only.
      */
-    int verboseVersion() default -1;
+    int verboseVersion() default 0;
 
     double decay() default 0.05;
 

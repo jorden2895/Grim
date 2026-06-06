@@ -2,6 +2,9 @@ package ac.grim.grimac.manager.datastore;
 
 import ac.grim.grimac.GrimAPI;
 import ac.grim.grimac.api.plugin.GrimPlugin;
+import ac.grim.grimac.checks.Check;
+import ac.grim.grimac.checks.CheckData;
+import ac.grim.grimac.checks.impl.badpackets.BadPacketsR;
 import ac.grim.grimac.manager.init.start.StartableInitable;
 import ac.grim.grimac.manager.init.stop.StoppableInitable;
 import ac.grim.grimac.api.storage.DataStore;
@@ -21,6 +24,7 @@ import ac.grim.grimac.api.storage.identity.NameResolverLink;
 import ac.grim.grimac.api.storage.registry.MigrationContext;
 import ac.grim.grimac.api.storage.registry.StoreId;
 import ac.grim.grimac.api.storage.submit.ViolationSink;
+import ac.grim.grimac.api.storage.verbose.VerboseSchema;
 import ac.grim.grimac.internal.storage.backend.mongo.MongoBackendConfig;
 import ac.grim.grimac.internal.storage.backend.mongo.v2.MongoBackendV2;
 import ac.grim.grimac.internal.storage.backend.mongo.v2.MongoMigrationContext;
@@ -52,6 +56,8 @@ import ac.grim.grimac.internal.storage.migrate.V0Reader;
 import ac.grim.grimac.internal.storage.retention.RetentionSweeper;
 import ac.grim.grimac.internal.storage.submit.ViolationSinkImpl;
 import ac.grim.grimac.internal.storage.verbose.VerboseManifest;
+import ac.grim.grimac.internal.storage.verbose.VerboseRegistry;
+import ac.grim.grimac.internal.storage.verbose.VerboseRegistryImpl;
 import com.mongodb.client.MongoDatabase;
 import org.bson.BsonBinarySubType;
 import org.bson.Document;
@@ -98,6 +104,7 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
     private DataStoreConfig config;
     private DataStoreImpl dataStore;
     private CheckRegistry checkRegistry;
+    private VerboseRegistry verboseRegistry;
     private HistoryServiceImpl historyService;
     private PlayerIdentityService playerIdentityService;
     private NameResolver nameResolver;
@@ -250,6 +257,7 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
         this.dataStore = new DataStoreImpl(router, config.writePath(), logger);
         this.dataStore.withV2Routes(routes);
         this.dataStore.start();
+        this.verboseRegistry = buildVerboseRegistry();
 
         logger.info("[grim-datastore] v2 cutover complete: " + v2ById.size()
                 + " v2 backend(s), " + routes + " routes installed, 0 legacy backends");
@@ -270,7 +278,8 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
 
         this.historyService = new HistoryServiceImpl(dataStore, checkRegistry,
                 config.history().entriesPerPage(), config.history().groupIntervalMs())
-                .withV2Startups(Categories.SERVER_STARTUP);
+                .withV2Startups(Categories.SERVER_STARTUP)
+                .withVerboseRegistry(verboseRegistry);
         this.playerIdentityService = new PlayerIdentityService(dataStore);
         this.nameResolver = buildNameResolver(dataStore, config.nameResolutionChain());
         this.violationSink = new ViolationSinkImpl(dataStore);
@@ -296,7 +305,9 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
             return null;
         }
 
-        byte[] verboseManifest = VerboseManifest.textOnly(VerboseManifest.FLAVOR_V2_PUBLIC);
+        byte[] verboseManifest = VerboseManifest.encode(
+                VerboseManifest.FLAVOR_V2_PUBLIC,
+                verboseRegistry.checkIdVersions(checkRegistry));
         V2InstanceRegistry.StartupClaim claim = instanceRegistry.claimStartup(
                 config.serverName(),
                 instanceId,
@@ -323,6 +334,47 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
                 logger);
         heartbeatScheduler.start();
         return claim;
+    }
+
+    private @NotNull VerboseRegistry buildVerboseRegistry() {
+        VerboseRegistry registry = new VerboseRegistryImpl(
+                dataStore,
+                checkRegistry,
+                VerboseManifest.FLAVOR_V2_PUBLIC);
+        registerVerboseSchema(registry, BadPacketsR.class, BadPacketsR.V);
+        return registry;
+    }
+
+    private void registerVerboseSchema(
+            @NotNull VerboseRegistry registry,
+            @NotNull Class<? extends Check> checkClass,
+            @NotNull VerboseSchema schema) {
+        CheckData data = checkClass.getAnnotation(CheckData.class);
+        if (data == null) {
+            throw new IllegalStateException(checkClass.getName() + " is missing @CheckData");
+        }
+        if (data.stableKey().isBlank()) {
+            throw new IllegalStateException(checkClass.getName() + " is missing a stableKey");
+        }
+        if (data.verboseVersion() < 0) {
+            throw new IllegalStateException(checkClass.getName() + " is missing verboseVersion");
+        }
+        if (schema.version() != data.verboseVersion()) {
+            throw new IllegalStateException(checkClass.getName() + " verbose schema v"
+                    + schema.version() + " does not match @CheckData verboseVersion="
+                    + data.verboseVersion());
+        }
+
+        checkRegistry.intern(data.stableKey(), data.name(), data.description(), safePluginVersion());
+        registry.register(data.stableKey(), schema);
+    }
+
+    private @Nullable String safePluginVersion() {
+        try {
+            return GrimAPI.INSTANCE.getExternalAPI().getGrimVersion();
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 
     private long instanceHeartbeatIntervalMs() {
@@ -383,6 +435,7 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
         liveWriteHooks = null;
         playerToggleStore = null;
         instanceRegistry = null;
+        verboseRegistry = null;
         loaded = false;
         enabled = false;
     }
@@ -508,6 +561,8 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
         if (cat == Categories.VIOLATION) {
             out.put(cat, new V2BackendBootstrap.Binding<>(
                     StoreId.grim("grim_violations"), V2BuiltinKinds.violations()));
+            out.put(Categories.VERBOSE_SCHEMA, new V2BackendBootstrap.Binding<>(
+                    StoreId.grim("verbose_schemas"), V2BuiltinKinds.verboseSchemas()));
         } else if (cat == Categories.SESSION) {
             out.put(cat, new V2BackendBootstrap.Binding<>(
                     StoreId.grim("grim_sessions"), V2BuiltinKinds.sessions()));
@@ -691,6 +746,7 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
         liveWriteHooks = null;
         playerToggleStore = null;
         instanceRegistry = null;
+        verboseRegistry = null;
         instanceId = null;
         startupId = null;
         startupStartedEpochMs = 0L;

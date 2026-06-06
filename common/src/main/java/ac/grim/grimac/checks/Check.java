@@ -4,6 +4,7 @@ import ac.grim.grimac.GrimAPI;
 import ac.grim.grimac.api.AbstractCheck;
 import ac.grim.grimac.api.config.ConfigManager;
 import ac.grim.grimac.api.event.events.FlagEvent;
+import ac.grim.grimac.api.storage.verbose.VerboseBuf;
 import ac.grim.grimac.player.GrimPlayer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
@@ -27,6 +28,7 @@ public class Check extends GrimProcessor implements AbstractCheck {
     public double violations;
     private double decay;
     private double setbackVL;
+    private final VerboseBuf verbose = new VerboseBuf();
 
     private String checkName;
     private String configName;
@@ -106,6 +108,28 @@ public class Check extends GrimProcessor implements AbstractCheck {
         lastViolationTime = System.currentTimeMillis();
         violations++;
         return true;
+    }
+
+    public final boolean flag(@NotNull VerboseBuf verbose) {
+        Objects.requireNonNull(verbose, "verbose");
+        assert verbose.length() >= 0;
+
+        if (player.disableGrim || (experimental && !player.isExperimentalChecks()) || exemptPermission)
+            return false; // Avoid calling event if disabled
+
+        if (FLAG_CHANNEL.fire(player, this, "")) return false;
+
+        byte[] verboseData = verbose.toByteArray();
+        player.punishmentManager.handleViolation(this);
+        lastViolationTime = System.currentTimeMillis();
+        violations++;
+        GrimAPI.INSTANCE.getDataStoreLifecycle().liveWriteHooks()
+                .recordFlagDataFromCheck(player, this, violations, verboseData);
+        return true;
+    }
+
+    protected final @NotNull VerboseBuf verbose() {
+        return verbose;
     }
 
     public final boolean flagWithSetback() {

@@ -1,5 +1,6 @@
 package ac.grim.grimac.checks.impl.badpackets;
 
+import ac.grim.grimac.api.storage.verbose.VerboseSchema;
 import ac.grim.grimac.checks.Check;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.type.PacketCheck;
@@ -12,8 +13,10 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPl
 
 import java.util.Locale;
 
-@CheckData(name = "BadPacketsL", stableKey = "grim.badpackets.invalid_dig", description = "Sent impossible dig packet")
+@CheckData(name = "BadPacketsL", stableKey = "grim.badpackets.invalid_dig", verboseVersion = 1, description = "Sent impossible dig packet")
 public class BadPacketsL extends Check implements PacketCheck {
+    public static final VerboseSchema V = VerboseSchema.of(
+            "x:zz", "y:zz", "z:zz", "face:zz", "sequence:zz", "action:str");
 
     public BadPacketsL(GrimPlayer player) {
         super(player);
@@ -41,12 +44,19 @@ public class BadPacketsL extends Check implements PacketCheck {
                     || packet.getBlockPosition().getZ() != 0
                     || packet.getSequence() != 0
             ) {
-                if (flagAndAlert("pos="
-                        + packet.getBlockPosition().getX() + ", " + packet.getBlockPosition().getY() + ", " + packet.getBlockPosition().getZ()
-                        + ", face=" + packet.getBlockFaceId()
-                        + ", sequence=" + packet.getSequence()
-                        + ", action=" + packet.getAction().toString().toLowerCase(Locale.ROOT)
-                ) && shouldModifyPackets() && canCancel(packet.getAction())) {
+                int x = packet.getBlockPosition().getX();
+                int y = packet.getBlockPosition().getY();
+                int z = packet.getBlockPosition().getZ();
+                int face = packet.getBlockFaceId();
+                int sequence = packet.getSequence();
+                String action = packet.getAction().toString().toLowerCase(Locale.ROOT);
+                String verbose = "pos="
+                        + x + ", " + y + ", " + z
+                        + ", face=" + face
+                        + ", sequence=" + sequence
+                        + ", action=" + action;
+                if (flag(V.write(verbose()).zz(x).zz(y).zz(z).zz(face).zz(sequence).str(action))
+                        && alert(verbose) && shouldModifyPackets() && canCancel(packet.getAction())) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }

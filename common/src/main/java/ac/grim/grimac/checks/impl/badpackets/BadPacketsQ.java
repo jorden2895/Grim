@@ -1,5 +1,6 @@
 package ac.grim.grimac.checks.impl.badpackets;
 
+import ac.grim.grimac.api.storage.verbose.VerboseSchema;
 import ac.grim.grimac.checks.Check;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.type.PacketCheck;
@@ -9,8 +10,10 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType.Play.Cli
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientEntityAction;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientEntityAction.Action;
 
-@CheckData(name = "BadPacketsQ", stableKey = "grim.badpackets.invalid_horse_jump")
+@CheckData(name = "BadPacketsQ", stableKey = "grim.badpackets.invalid_horse_jump", verboseVersion = 1)
 public class BadPacketsQ extends Check implements PacketCheck {
+    public static final VerboseSchema V = VerboseSchema.of("boost:zz", "action:str", "entity:zz");
+
     public BadPacketsQ(final GrimPlayer player) {
         super(player);
     }
@@ -23,7 +26,11 @@ public class BadPacketsQ extends Check implements PacketCheck {
             if (Math.abs(wrapper.getJumpBoost()) > 100
                     || wrapper.getEntityId() != player.entityID
                     || wrapper.getAction() != Action.START_JUMPING_WITH_HORSE && wrapper.getJumpBoost() != 0) {
-                if (flagAndAlert("boost=" + wrapper.getJumpBoost() + ", action=" + wrapper.getAction() + ", entity=" + wrapper.getEntityId()) && shouldModifyPackets()) {
+                int boost = wrapper.getJumpBoost();
+                String action = String.valueOf(wrapper.getAction());
+                int entity = wrapper.getEntityId();
+                String verbose = "boost=" + boost + ", action=" + action + ", entity=" + entity;
+                if (flag(V.write(verbose()).zz(boost).str(action).zz(entity)) && alert(verbose) && shouldModifyPackets()) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }

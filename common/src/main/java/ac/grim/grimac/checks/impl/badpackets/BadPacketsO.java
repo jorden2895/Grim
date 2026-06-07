@@ -1,5 +1,6 @@
 package ac.grim.grimac.checks.impl.badpackets;
 
+import ac.grim.grimac.api.storage.verbose.VerboseSchema;
 import ac.grim.grimac.checks.Check;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.type.PacketCheck;
@@ -12,8 +13,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerKe
 
 import java.util.LinkedList;
 
-@CheckData(name = "BadPacketsO", stableKey = "grim.badpackets.invalid_keepalive")
+@CheckData(name = "BadPacketsO", stableKey = "grim.badpackets.invalid_keepalive", verboseVersion = 1)
 public class BadPacketsO extends Check implements PacketCheck {
+    public static final VerboseSchema V = VerboseSchema.of("id:str");
+
     private final LinkedList<Long> keepalives = new LinkedList<>();
 
     public BadPacketsO(GrimPlayer player) {
@@ -44,7 +47,8 @@ public class BadPacketsO extends Check implements PacketCheck {
                 }
             }
 
-            if (flagAndAlert("id=" + id) && shouldModifyPackets()) {
+            String verbose = "id=" + id;
+            if (flag(V.write(verbose()).str(Long.toString(id))) && alert(verbose) && shouldModifyPackets()) {
                 event.setCancelled(true);
                 player.onPacketCancel();
             }

@@ -40,9 +40,8 @@ public class PacketOrderL extends Check implements PostPredictionCheck {
         if (event.getPacketType() == PacketType.Play.Client.CLIENT_STATUS) {
             if (new WrapperPlayClientClientStatus(event).getAction() == WrapperPlayClientClientStatus.Action.OPEN_INVENTORY_ACHIEVEMENT) {
                 if (player.packetOrderProcessor.isDropping()) {
-                    String verbose = verbose(ACTION_INVENTORY);
                     if (!player.canSkipTicks()) {
-                        if (flagAndAlert(V.write(verbose()).vi(ACTION_INVENTORY), verbose) && shouldModifyPackets()) {
+                        if (flagAndAlert(V.write(verbose()).vi(ACTION_INVENTORY)) && shouldModifyPackets()) {
                             event.setCancelled(true);
                             player.onPacketCancel();
                         }
@@ -56,9 +55,8 @@ public class PacketOrderL extends Check implements PostPredictionCheck {
         if (event.getPacketType() == PacketType.Play.Client.PLAYER_DIGGING) {
             if (new WrapperPlayClientPlayerDigging(event).getAction() == DiggingAction.SWAP_ITEM_WITH_OFFHAND) {
                 if (player.packetOrderProcessor.isDropping()) {
-                    String verbose = verbose(ACTION_SWAP);
                     if (!player.canSkipTicks()) {
-                        if (flagAndAlert(V.write(verbose()).vi(ACTION_SWAP), verbose) && shouldModifyPackets()) {
+                        if (flagAndAlert(V.write(verbose()).vi(ACTION_SWAP)) && shouldModifyPackets()) {
                             event.setCancelled(true);
                             player.onPacketCancel();
                         }
@@ -76,8 +74,7 @@ public class PacketOrderL extends Check implements PostPredictionCheck {
 
         if (player.isTickingReliablyFor(3)) {
             for (int action : flags) {
-                String verbose = verbose(action);
-                flagAndAlert(V.write(verbose()).vi(action), verbose);
+                flagAndAlert(V.write(verbose()).vi(action));
             }
         }
 

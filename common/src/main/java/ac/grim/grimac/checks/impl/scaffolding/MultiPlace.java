@@ -43,16 +43,13 @@ public class MultiPlace extends BlockPlaceCheck {
             final String lastCursorText = MessageUtil.toUnlabledString(lastCursor);
             final String posText = MessageUtil.toUnlabledString(pos);
             final String lastPosText = MessageUtil.toUnlabledString(lastPos);
-            final String verbose = "face=" + faceName + ", lastFace=" + lastFaceName
-                    + ", cursor=" + cursorText + ", lastCursor=" + lastCursorText
-                    + ", pos=" + posText + ", lastPos=" + lastPosText;
             if (!player.canSkipTicks()) {
-                if (flagAndAlert(V.write(verbose()).str(faceName).str(lastFaceName).str(cursorText).str(lastCursorText).str(posText).str(lastPosText), verbose)
+                if (flagAndAlert(V.write(verbose()).str(faceName).str(lastFaceName).str(cursorText).str(lastCursorText).str(posText).str(lastPosText))
                         && shouldModifyPackets() && shouldCancel()) {
                     place.resync();
                 }
             } else {
-                flags.add(new FlagData(verbose, faceName, lastFaceName, cursorText, lastCursorText, posText, lastPosText));
+                flags.add(new FlagData(faceName, lastFaceName, cursorText, lastCursorText, posText, lastPosText));
             }
         }
 
@@ -75,8 +72,7 @@ public class MultiPlace extends BlockPlaceCheck {
 
         if (player.isTickingReliablyFor(3)) {
             for (FlagData data : flags) {
-                String verbose = data.verbose();
-                flagAndAlert(V.write(verbose()).str(data.face()).str(data.lastFace()).str(data.cursor()).str(data.lastCursor()).str(data.pos()).str(data.lastPos()), verbose);
+                flagAndAlert(V.write(verbose()).str(data.face()).str(data.lastFace()).str(data.cursor()).str(data.lastCursor()).str(data.pos()).str(data.lastPos()));
             }
         }
 
@@ -84,7 +80,6 @@ public class MultiPlace extends BlockPlaceCheck {
     }
 
     private record FlagData(
-            String verbose,
             String face,
             String lastFace,
             String cursor,

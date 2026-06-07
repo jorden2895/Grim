@@ -42,13 +42,12 @@ public class MultiActionsF extends BlockPlaceCheck {
     public void onBlockPlace(BlockPlace place) {
         block = true;
         if (entity) {
-            String verbose = verbose(ACTION_PLACE);
             if (!player.canSkipTicks()) {
-                if (flagAndAlert(V.write(verbose()).vi(ACTION_PLACE), verbose) && shouldModifyPackets() && shouldCancel()) {
+                if (flagAndAlert(V.write(verbose()).vi(ACTION_PLACE)) && shouldModifyPackets() && shouldCancel()) {
                     place.resync();
                 }
             } else {
-                flags.add(new FlagData(verbose, ACTION_PLACE));
+                flags.add(new FlagData(ACTION_PLACE));
             }
         }
     }
@@ -60,14 +59,13 @@ public class MultiActionsF extends BlockPlaceCheck {
                 || event.getPacketType() == PacketType.Play.Client.SPECTATE_ENTITY) {
             entity = true;
             if (block) {
-                String verbose = verbose(ACTION_ENTITY);
                 if (!player.canSkipTicks()) {
-                    if (flagAndAlert(V.write(verbose()).vi(ACTION_ENTITY), verbose) && shouldModifyPackets()) {
+                    if (flagAndAlert(V.write(verbose()).vi(ACTION_ENTITY)) && shouldModifyPackets()) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }
                 } else {
-                    flags.add(new FlagData(verbose, ACTION_ENTITY));
+                    flags.add(new FlagData(ACTION_ENTITY));
                 }
             }
         }
@@ -82,13 +80,12 @@ public class MultiActionsF extends BlockPlaceCheck {
         if (blockBreak.action == DiggingAction.START_DIGGING || blockBreak.action == DiggingAction.FINISHED_DIGGING) {
             block = true;
             if (entity) {
-                String verbose = verbose(ACTION_DIG);
                 if (!player.canSkipTicks()) {
-                    if (flagAndAlert(V.write(verbose()).vi(ACTION_DIG), verbose) && shouldModifyPackets()) {
+                    if (flagAndAlert(V.write(verbose()).vi(ACTION_DIG)) && shouldModifyPackets()) {
                         blockBreak.cancel();
                     }
                 } else {
-                    flags.add(new FlagData(verbose, ACTION_DIG));
+                    flags.add(new FlagData(ACTION_DIG));
                 }
             }
         }
@@ -100,13 +97,13 @@ public class MultiActionsF extends BlockPlaceCheck {
 
         if (player.isTickingReliablyFor(3)) {
             for (FlagData data : flags) {
-                flagAndAlert(V.write(verbose()).vi(data.action()), data.verbose());
+                flagAndAlert(V.write(verbose()).vi(data.action()));
             }
         }
 
         flags.clear();
     }
 
-    private record FlagData(String verbose, int action) {
+    private record FlagData(int action) {
     }
 }

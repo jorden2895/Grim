@@ -32,8 +32,7 @@ public class BadPacketsV extends Check implements PacketCheck {
                             .distanceSquared(new Vector3d(player.lastX, player.lastY, player.lastZ));
                     if (deltaSq <= player.getMovementThreshold() * player.getMovementThreshold()) {
                         double delta = Math.sqrt(deltaSq);
-                        String verbose = "delta=" + delta;
-                        flagAndAlert(V.write(verbose()).f64(delta), verbose);
+                        flagAndAlert(V.write(verbose()).f64(delta));
                     }
                 }
 

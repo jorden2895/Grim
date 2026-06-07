@@ -41,8 +41,7 @@ public class PacketOrderO extends Check implements PacketCheck {
             }
 
             String packetType = event.getPacketType().toString();
-            String verbose = "type=" + packetType;
-            flagAndAlert(V.write(verbose()).str(packetType), verbose);
+            flagAndAlert(V.write(verbose()).str(packetType));
         }
     }
 }

@@ -26,8 +26,7 @@ public class NegativeTimer extends Timer implements PostPredictionCheck {
 
         if (timerBalanceRealTime < lastMovementPlayerClock - clockDrift) {
             int lostMS = (int) ((System.nanoTime() - timerBalanceRealTime) / 1e6);
-            String verbose = "-" + lostMS;
-            flagAndAlertWithSetback(V.write(verbose()).vl(lostMS), verbose);
+            flagAndAlertWithSetback(V.write(verbose()).vl(lostMS));
             timerBalanceRealTime += 50e6;
         }
     }

@@ -32,8 +32,7 @@ public class BadPacketsF extends Check implements PacketCheck {
                         return;
                     }
                     boolean state = true;
-                    String verbose = "state=" + state;
-                    if (flagAndAlert(V.write(verbose()).bool(state), verbose) && shouldModifyPackets()) {
+                    if (flagAndAlert(V.write(verbose()).bool(state)) && shouldModifyPackets()) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }
@@ -47,8 +46,7 @@ public class BadPacketsF extends Check implements PacketCheck {
                         return;
                     }
                     boolean state = false;
-                    String verbose = "state=" + state;
-                    if (flagAndAlert(V.write(verbose()).bool(state), verbose) && shouldModifyPackets()) {
+                    if (flagAndAlert(V.write(verbose()).bool(state)) && shouldModifyPackets()) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }

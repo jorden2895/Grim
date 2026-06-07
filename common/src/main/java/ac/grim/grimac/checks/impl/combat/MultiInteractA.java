@@ -54,15 +54,13 @@ public class MultiInteractA extends Check implements PostPredictionCheck {
 
     private void onInteract(PacketReceiveEvent event, int entity, boolean sneaking) {
         if (hasInteracted && (entity != lastEntity || sneaking != lastSneaking)) {
-            String verbose = "lastEntity=" + lastEntity + ", entity=" + entity
-                    + ", lastSneaking=" + lastSneaking + ", sneaking=" + sneaking;
             if (!player.canSkipTicks()) {
-                if (flagAndAlert(V.write(verbose()).zz(lastEntity).zz(entity).bool(lastSneaking).bool(sneaking), verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).zz(lastEntity).zz(entity).bool(lastSneaking).bool(sneaking)) && shouldModifyPackets()) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }
             } else {
-                flags.add(new FlagData(verbose, lastEntity, entity, lastSneaking, sneaking));
+                flags.add(new FlagData(lastEntity, entity, lastSneaking, sneaking));
             }
         }
 
@@ -77,14 +75,13 @@ public class MultiInteractA extends Check implements PostPredictionCheck {
 
         if (player.isTickingReliablyFor(3)) {
             for (FlagData data : flags) {
-                String verbose = data.verbose();
-                flagAndAlert(V.write(verbose()).zz(data.lastEntity()).zz(data.entity()).bool(data.lastSneaking()).bool(data.sneaking()), verbose);
+                flagAndAlert(V.write(verbose()).zz(data.lastEntity()).zz(data.entity()).bool(data.lastSneaking()).bool(data.sneaking()));
             }
         }
 
         flags.clear();
     }
 
-    private record FlagData(String verbose, int lastEntity, int entity, boolean lastSneaking, boolean sneaking) {
+    private record FlagData(int lastEntity, int entity, boolean lastSneaking, boolean sneaking) {
     }
 }

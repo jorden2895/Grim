@@ -28,8 +28,7 @@ public class BadPacketsG extends Check implements PacketCheck {
                 // The player may send two START_SNEAKING packets if they respawned
                 if (lastSneaking && !respawn) {
                     boolean state = true;
-                    String verbose = "state=" + state;
-                    if (flagAndAlert(V.write(verbose()).bool(state), verbose) && shouldModifyPackets()) {
+                    if (flagAndAlert(V.write(verbose()).bool(state)) && shouldModifyPackets()) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }
@@ -40,8 +39,7 @@ public class BadPacketsG extends Check implements PacketCheck {
             } else if (packet.getAction() == WrapperPlayClientEntityAction.Action.STOP_SNEAKING) {
                 if (!lastSneaking && !respawn) {
                     boolean state = false;
-                    String verbose = "state=" + state;
-                    if (flagAndAlert(V.write(verbose()).bool(state), verbose) && shouldModifyPackets()) {
+                    if (flagAndAlert(V.write(verbose()).bool(state)) && shouldModifyPackets()) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }

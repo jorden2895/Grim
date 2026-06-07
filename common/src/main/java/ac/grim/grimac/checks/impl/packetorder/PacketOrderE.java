@@ -45,7 +45,7 @@ public class PacketOrderE extends Check implements PostPredictionCheck {
                         + ", sprinting=" + player.packetOrderProcessor.isSprinting()
                         + ", gliding=" + player.packetOrderProcessor.isStartingToGlide()
                         + ", mountJumping=" + player.packetOrderProcessor.isJumpingWithMount();
-                if (player.canSkipTicks() && flags.add(verbose) || flagAndAlert(V.write(verbose()).str(verbose), verbose)) {
+                if (player.canSkipTicks() && flags.add(verbose) || flagAndAlert(V.write(verbose()).str(verbose))) {
                     if (player.packetOrderProcessor.isUsing()) {
                         setback = true;
                     }
@@ -66,7 +66,7 @@ public class PacketOrderE extends Check implements PostPredictionCheck {
 
         if (player.isTickingReliablyFor(3)) {
             for (String verbose : flags) {
-                if (flagAndAlert(V.write(verbose()).str(verbose), verbose) && setback) {
+                if (flagAndAlert(V.write(verbose()).str(verbose)) && setback) {
                     setback = false;
                     setbackIfAboveSetbackVL();
                 }

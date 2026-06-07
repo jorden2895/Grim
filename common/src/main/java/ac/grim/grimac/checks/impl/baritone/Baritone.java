@@ -34,8 +34,7 @@ public class Baritone extends Check implements RotationCheck {
                 verbose++;
                 if (verbose > 8) {
                     double divisor = AimProcessor.convertToSensitivity(rotationUpdate.getProcessor().divisorX);
-                    String alert = "Divisor " + divisor;
-                    flagAndAlert(V.write(verbose()).f64(divisor), alert);
+                    flagAndAlert(V.write(verbose()).f64(divisor));
                 }
             } else {
                 verbose = 0;

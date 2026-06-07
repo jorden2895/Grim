@@ -29,8 +29,7 @@ public class BadPacketsQ extends Check implements PacketCheck {
                 int boost = wrapper.getJumpBoost();
                 String action = String.valueOf(wrapper.getAction());
                 int entity = wrapper.getEntityId();
-                String verbose = "boost=" + boost + ", action=" + action + ", entity=" + entity;
-                if (flagAndAlert(V.write(verbose()).zz(boost).str(action).zz(entity), verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).zz(boost).str(action).zz(entity)) && shouldModifyPackets()) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }

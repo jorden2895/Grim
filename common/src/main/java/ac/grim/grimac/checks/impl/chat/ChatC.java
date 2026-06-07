@@ -51,9 +51,8 @@ public class ChatC extends Check implements PacketCheck {
         boolean sprinting = MultiActionsC.isVerboseSprinting(player);
         boolean sneaking = MultiActionsC.isVerboseSneaking(player);
         boolean input = MultiActionsC.isVerboseInput(player);
-        String verbose = MultiActionsC.getVerbose(sprinting, sneaking, input);
-        if (!verbose.isEmpty()
-                && flagAndAlert(V.write(verbose()).bool(sprinting).bool(sneaking).bool(input), verbose)
+        if ((sprinting || sneaking || input)
+                && flagAndAlert(V.write(verbose()).bool(sprinting).bool(sneaking).bool(input))
                 && shouldModifyPackets()) {
             event.setCancelled(true);
             player.onPacketCancel();

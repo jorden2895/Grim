@@ -32,8 +32,7 @@ public class PositionBreakB extends Check implements BlockBreakCheck {
         if (lastFace != null) {
             String lastFaceName = String.valueOf(lastFace);
             String action = String.valueOf(blockBreak.action);
-            String verbose = "lastFace=" + lastFaceName + ", action=" + action;
-            flagAndAlert(V.write(verbose()).str(lastFaceName).str(action), verbose);
+            flagAndAlert(V.write(verbose()).str(lastFaceName).str(action));
         }
 
         if (blockBreak.action == DiggingAction.CANCELLED_DIGGING) {

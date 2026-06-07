@@ -24,8 +24,7 @@ public class VehicleE extends Check implements PacketCheck {
             final EntityType vehicle = player.getVehicleType();
 
             if (!EntityTypes.isTypeInstanceOf(vehicle, EntityTypes.BOAT)) {
-                String verbose = "vehicle=" + (vehicle == null ? "null" : vehicle.getName().getKey().toLowerCase());
-                if (flagAndAlert(V.write(verbose()).bool(vehicle != null).vi(vehicle == null ? 0 : vehicle.getId(player.getClientVersion())), verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).bool(vehicle != null).vi(vehicle == null ? 0 : vehicle.getId(player.getClientVersion()))) && shouldModifyPackets()) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }

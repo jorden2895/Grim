@@ -213,8 +213,7 @@ public class KnockbackHandler extends Check implements PostPredictionCheck {
                     }
                 } else {
                     boolean ignored = player.likelyKB.offset == Integer.MAX_VALUE;
-                    String verbose = ignored ? "ignored knockback" : "o: " + formatOffset(player.likelyKB.offset);
-                    if (flagAndAlert(V.write(verbose()).bool(ignored).f64(player.likelyKB.offset), verbose)) { // This velocity was sent by the server.
+                    if (flagAndAlert(V.write(verbose()).bool(ignored).f64(player.likelyKB.offset))) { // This velocity was sent by the server.
                         if (player.likelyKB.offset >= immediate || threshold >= maxAdv) {
                             setbackIfAboveSetbackVL();
                         }

@@ -62,8 +62,7 @@ public class WrongBreak extends Check implements BlockBreakCheck {
                     String action = "CANCELLED_DIGGING";
                     String lastPos = MessageUtil.toUnlabledString(lastBlock);
                     String currentPos = MessageUtil.toUnlabledString(pos);
-                    String verbose = "action=" + action + ", last=" + lastPos + ", pos=" + currentPos;
-                    if (flagAndAlert(V.write(verbose()).str(action).str(lastPos).str(currentPos), verbose)) {
+                    if (flagAndAlert(V.write(verbose()).str(action).str(lastPos).str(currentPos))) {
                         if (shouldModifyPackets()) {
                             blockBreak.cancel();
                         }
@@ -85,8 +84,7 @@ public class WrongBreak extends Check implements BlockBreakCheck {
                 String action = "FINISHED_DIGGING";
                 String lastPos = MessageUtil.toUnlabledString(lastBlock);
                 String currentPos = MessageUtil.toUnlabledString(pos);
-                String verbose = "action=" + action + ", last=" + lastPos + ", pos=" + currentPos;
-                if (flagAndAlert(V.write(verbose()).str(action).str(lastPos).str(currentPos), verbose)) {
+                if (flagAndAlert(V.write(verbose()).str(action).str(lastPos).str(currentPos))) {
                     if (shouldModifyPackets()) {
                         blockBreak.cancel();
                     }

@@ -47,13 +47,12 @@ public class PacketOrderD extends Check implements PacketCheck {
                 if (packet.getHand() == InteractionHand.OFF_HAND) {
                     if (action == InteractAction.INTERACT || player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_26_1)) {
                         if (!sentMainhand) {
-                            String verbose = literal(KIND_SKIPPED_MAINHAND);
                             if (flagAndAlert(V.write(verbose())
                                     .vi(KIND_SKIPPED_MAINHAND)
                                     .zz(0)
                                     .zz(0)
                                     .bool(false)
-                                    .bool(false), verbose) && shouldModifyPackets()) {
+                                    .bool(false)) && shouldModifyPackets()) {
                                 event.setCancelled(true);
                                 player.onPacketCancel();
                             }
@@ -63,14 +62,12 @@ public class PacketOrderD extends Check implements PacketCheck {
 
                     if (action == InteractAction.INTERACT_AT) {
                         if (sneaking != requiredSneaking || entity != requiredEntity) {
-                            String verbose = "requiredEntity=" + requiredEntity + ", entity=" + entity
-                                    + ", requiredSneaking=" + requiredSneaking + ", sneaking=" + sneaking;
                             if (flagAndAlert(V.write(verbose())
                                     .vi(KIND_MISMATCH)
                                     .zz(requiredEntity)
                                     .zz(entity)
                                     .bool(requiredSneaking)
-                                    .bool(sneaking), verbose) && shouldModifyPackets()) {
+                                    .bool(sneaking)) && shouldModifyPackets()) {
                                 event.setCancelled(true);
                                 player.onPacketCancel();
                             }

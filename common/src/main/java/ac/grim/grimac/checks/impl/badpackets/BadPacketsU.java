@@ -51,14 +51,10 @@ public class BadPacketsU extends Check implements PacketCheck {
                         || cursor.z != 0
                         || packet.getSequence() != 0
                 ) {
-                    final String verbose = String.format(
-                            "xyz=%s, %s, %s, cursor=%s, %s, %s, item=%s, sequence=%s",
-                            pos.x, pos.y, pos.z, cursor.x, cursor.y, cursor.z, !failedItemCheck, packet.getSequence()
-                    );
                     if (flagAndAlert(V.write(verbose())
                             .zz(pos.x).zz(pos.y).zz(pos.z)
                             .f32(cursor.x).f32(cursor.y).f32(cursor.z)
-                            .bool(!failedItemCheck).zz(packet.getSequence()), verbose)
+                            .bool(!failedItemCheck).zz(packet.getSequence()))
                             && shouldModifyPackets()) {
                         player.onPacketCancel();
                         event.setCancelled(true);

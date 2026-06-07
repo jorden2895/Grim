@@ -173,6 +173,7 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
         if (!builder.enabled()) {
             logger.info("[grim-datastore] disabled in database.yml — skipping storage init");
             this.enabled = false;
+            installLocalVerboseRegistry();
             return;
         }
         try {
@@ -180,6 +181,7 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
         } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "[grim-datastore] database.yml rejected — storage disabled", e);
             this.enabled = false;
+            installLocalVerboseRegistry();
             return;
         }
 
@@ -189,6 +191,7 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
             logger.log(Level.SEVERE, "[grim-datastore] failed to initialise storage — falling back to disabled", e);
             this.enabled = false;
             try { teardown(); } catch (Exception ignore) {}
+            installLocalVerboseRegistry();
         }
     }
 
@@ -389,6 +392,18 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
         registerVerboseSchema(registry, Reach.class, Reach.V);
         registerVerboseFormatter(registry, Reach.class, reachFormatter());
         return registry;
+    }
+
+    private void installLocalVerboseRegistry() {
+        try {
+            CheckRegistry localChecks = new CheckRegistry(new InMemoryCheckCatalogPersistence());
+            localChecks.reload();
+            this.checkRegistry = localChecks;
+            this.verboseRegistry = buildVerboseRegistry();
+        } catch (RuntimeException e) {
+            logger.log(Level.WARNING,
+                    "[grim-datastore] failed to initialise local verbose registry", e);
+        }
     }
 
     private static @NotNull VerboseFormatter simulationFormatter() {
@@ -905,6 +920,7 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
     public @Nullable NameResolver nameResolver() { return nameResolver; }
     public @Nullable ViolationSink violationSink() { return violationSink; }
     public @Nullable DataStoreConfig config() { return config; }
+    public @Nullable VerboseRegistry verboseRegistry() { return verboseRegistry; }
 
     /**
      * The live-writes facade used by {@code PunishmentManager} and

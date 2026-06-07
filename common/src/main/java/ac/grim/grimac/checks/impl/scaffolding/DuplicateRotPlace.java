@@ -37,8 +37,7 @@ public class DuplicateRotPlace extends BlockPlaceCheck {
                 double xDiffDots = Math.abs(deltaDotsX - lastPlacedDeltaDotsX);
 
                 if (xDiff < 0.0001) {
-                    String verbose = "x=" + xDiff + " xdots=" + xDiffDots + " y=" + deltaY;
-                    flagAndAlert(V.write(verbose()).f64(xDiff).f64(xDiffDots).f64(deltaY), verbose);
+                    flagAndAlert(V.write(verbose()).f64(xDiff).f64(xDiffDots).f64(deltaY));
                 } else {
                     reward();
                 }

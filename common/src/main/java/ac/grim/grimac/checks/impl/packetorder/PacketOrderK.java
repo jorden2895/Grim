@@ -42,11 +42,10 @@ public class PacketOrderK extends Check implements PostPredictionCheck {
                 if (player.packetOrderProcessor.isClickingInInventory() || player.packetOrderProcessor.isClosingInventory()) {
                     boolean clicking = player.packetOrderProcessor.isClickingInInventory();
                     boolean closing = player.packetOrderProcessor.isClosingInventory();
-                    String verbose = verbose(KIND_OPEN, clicking, closing);
                     if (!player.canSkipTicks()) {
-                        flagAndAlert(V.write(verbose()).vi(KIND_OPEN).bool(clicking).bool(closing), verbose);
+                        flagAndAlert(V.write(verbose()).vi(KIND_OPEN).bool(clicking).bool(closing));
                     } else {
-                        flags.add(new FlagData(verbose, KIND_OPEN, clicking, closing));
+                        flags.add(new FlagData(KIND_OPEN, clicking, closing));
                     }
                 }
             }
@@ -55,15 +54,14 @@ public class PacketOrderK extends Check implements PostPredictionCheck {
         if (event.getPacketType() == PacketType.Play.Client.CLICK_WINDOW || event.getPacketType() == PacketType.Play.Client.CLOSE_WINDOW) {
             if (player.packetOrderProcessor.isOpeningInventory()) {
                 int kind = event.getPacketType() == PacketType.Play.Client.CLICK_WINDOW ? KIND_CLICK : KIND_CLOSE;
-                String verbose = verbose(kind, false, false);
                 if (!player.canSkipTicks()) {
-                    if (flagAndAlert(V.write(verbose()).vi(kind).bool(false).bool(false), verbose)
+                    if (flagAndAlert(V.write(verbose()).vi(kind).bool(false).bool(false))
                             && shouldModifyPackets() && event.getPacketType() == PacketType.Play.Client.CLICK_WINDOW) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }
                 } else {
-                    flags.add(new FlagData(verbose, kind, false, false));
+                    flags.add(new FlagData(kind, false, false));
                 }
             }
         }
@@ -75,13 +73,13 @@ public class PacketOrderK extends Check implements PostPredictionCheck {
 
         if (player.isTickingReliablyFor(3)) {
             for (FlagData data : flags) {
-                flagAndAlert(V.write(verbose()).vi(data.kind()).bool(data.clicking()).bool(data.closing()), data.verbose());
+                flagAndAlert(V.write(verbose()).vi(data.kind()).bool(data.clicking()).bool(data.closing()));
             }
         }
 
         flags.clear();
     }
 
-    private record FlagData(String verbose, int kind, boolean clicking, boolean closing) {
+    private record FlagData(int kind, boolean clicking, boolean closing) {
     }
 }

@@ -41,15 +41,12 @@ public class MultiBreak extends Check implements BlockBreakCheck {
             final String previousFace = String.valueOf(lastFace);
             final String pos = MessageUtil.toUnlabledString(blockBreak.position);
             final String previousPos = MessageUtil.toUnlabledString(lastPos);
-            final String verbose = "face=" + face + ", lastFace=" + previousFace
-                    + ", pos=" + pos
-                    + ", lastPos=" + previousPos;
             if (!player.canSkipTicks()) {
-                if (flagAndAlert(V.write(verbose()).str(face).str(previousFace).str(pos).str(previousPos), verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).str(face).str(previousFace).str(pos).str(previousPos)) && shouldModifyPackets()) {
                     blockBreak.cancel();
                 }
             } else {
-                flags.add(new FlagData(verbose, face, previousFace, pos, previousPos));
+                flags.add(new FlagData(face, previousFace, pos, previousPos));
             }
         }
 
@@ -71,14 +68,13 @@ public class MultiBreak extends Check implements BlockBreakCheck {
 
         if (player.isTickingReliablyFor(3)) {
             for (FlagData data : flags) {
-                String verbose = data.verbose();
-                flagAndAlert(V.write(verbose()).str(data.face()).str(data.previousFace()).str(data.pos()).str(data.previousPos()), verbose);
+                flagAndAlert(V.write(verbose()).str(data.face()).str(data.previousFace()).str(data.pos()).str(data.previousPos()));
             }
         }
 
         flags.clear();
     }
 
-    private record FlagData(String verbose, String face, String previousFace, String pos, String previousPos) {
+    private record FlagData(String face, String previousFace, String pos, String previousPos) {
     }
 }

@@ -73,10 +73,9 @@ public class MultiActionsC extends Check implements PacketCheck {
         boolean sprinting = isVerboseSprinting(player);
         boolean sneaking = isVerboseSneaking(player);
         boolean input = isVerboseInput(player);
-        String verbose = getVerbose(sprinting, sneaking, input);
-        if (verbose.isEmpty()) return;
+        if (!sprinting && !sneaking && !input) return;
 
-        if (flagAndAlert(V.write(verbose()).bool(sprinting).bool(sneaking).bool(input), verbose) && shouldModifyPackets()) {
+        if (flagAndAlert(V.write(verbose()).bool(sprinting).bool(sneaking).bool(input)) && shouldModifyPackets()) {
             event.setCancelled(true);
             player.onPacketCancel();
         }

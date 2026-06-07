@@ -38,30 +38,26 @@ public class MultiActionsG extends BlockPlaceCheck {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
-        String interact = verbose(ACTION_INTERACT);
         if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY && isCheckActive()
-                && flagAndAlert(V.write(verbose()).vi(ACTION_INTERACT), interact) && shouldModifyPackets()) {
+                && flagAndAlert(V.write(verbose()).vi(ACTION_INTERACT)) && shouldModifyPackets()) {
             event.setCancelled(true);
             player.onPacketCancel();
         }
 
-        String attack = verbose(ACTION_ATTACK);
         if (event.getPacketType() == PacketType.Play.Client.ATTACK && isCheckActive()
-                && flagAndAlert(V.write(verbose()).vi(ACTION_ATTACK), attack) && shouldModifyPackets()) {
+                && flagAndAlert(V.write(verbose()).vi(ACTION_ATTACK)) && shouldModifyPackets()) {
             event.setCancelled(true);
             player.onPacketCancel();
         }
 
-        String spectateEntity = verbose(ACTION_SPECTATE_ENTITY);
         if (event.getPacketType() == PacketType.Play.Client.SPECTATE_ENTITY && isCheckActive()
-                && flagAndAlert(V.write(verbose()).vi(ACTION_SPECTATE_ENTITY), spectateEntity) && shouldModifyPackets()) {
+                && flagAndAlert(V.write(verbose()).vi(ACTION_SPECTATE_ENTITY)) && shouldModifyPackets()) {
             event.setCancelled(true);
             player.onPacketCancel();
         }
 
-        String use = verbose(ACTION_USE);
         if (event.getPacketType() == PacketType.Play.Client.USE_ITEM && isCheckActive()
-                && flagAndAlert(V.write(verbose()).vi(ACTION_USE), use) && shouldModifyPackets()) {
+                && flagAndAlert(V.write(verbose()).vi(ACTION_USE)) && shouldModifyPackets()) {
             event.setCancelled(true);
             player.onPacketCancel();
         }
@@ -70,8 +66,7 @@ public class MultiActionsG extends BlockPlaceCheck {
     @Override
     public void onBlockPlace(BlockPlace place) {
         int action = place.getFace() == BlockFace.OTHER ? ACTION_USE : ACTION_PLACE;
-        String verbose = verbose(action);
-        if (isCheckActive() && flagAndAlert(V.write(verbose()).vi(action), verbose) && shouldModifyPackets() && shouldCancel()) {
+        if (isCheckActive() && flagAndAlert(V.write(verbose()).vi(action)) && shouldModifyPackets() && shouldCancel()) {
             place.resync();
         }
     }

@@ -30,15 +30,13 @@ public class CrashF extends Check implements PacketCheck {
 
             if ((clickType == WindowClickType.QUICK_MOVE || clickType == WindowClickType.SWAP) && windowId >= 0 && button < 0) {
                 String clickTypeName = String.valueOf(clickType);
-                String verbose = "clickType=" + clickTypeName + " button=" + button;
-                if (flagAndAlert(V.write(verbose()).str(clickTypeName).zz(button).bool(false).zz(0), verbose)) {
+                if (flagAndAlert(V.write(verbose()).str(clickTypeName).zz(button).bool(false).zz(0))) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }
             } else if (windowId >= 0 && clickType == WindowClickType.SWAP && slot < 0) {
                 String clickTypeName = String.valueOf(clickType);
-                String verbose = "clickType=" + clickTypeName + " button=" + button + " slot=" + slot;
-                if (flagAndAlert(V.write(verbose()).str(clickTypeName).zz(button).bool(true).zz(slot), verbose)) {
+                if (flagAndAlert(V.write(verbose()).str(clickTypeName).zz(button).bool(true).zz(slot))) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }

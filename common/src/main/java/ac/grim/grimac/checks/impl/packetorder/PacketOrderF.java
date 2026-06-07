@@ -76,9 +76,8 @@ public class PacketOrderF extends Check implements PostPredictionCheck {
             int action = action(event);
             boolean sprinting = player.packetOrderProcessor.isSprinting();
             boolean sneaking = player.packetOrderProcessor.isSneaking();
-            String verbose = verbose(action, sprinting, sneaking);
             if (!player.canSkipTicks()) {
-                if (flagAndAlert(V.write(verbose()).vi(action).bool(sprinting).bool(sneaking), verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).vi(action).bool(sprinting).bool(sneaking)) && shouldModifyPackets()) {
                     if (event.getPacketType() == PacketType.Play.Client.PLAYER_DIGGING
                             && !canCancel(new WrapperPlayClientPlayerDigging(event).getAction())
                     ) return; // don't cause a noslow
@@ -87,7 +86,7 @@ public class PacketOrderF extends Check implements PostPredictionCheck {
                     player.onPacketCancel();
                 }
             } else {
-                flags.add(new FlagData(verbose, action, sprinting, sneaking));
+                flags.add(new FlagData(action, sprinting, sneaking));
             }
         }
     }
@@ -98,13 +97,13 @@ public class PacketOrderF extends Check implements PostPredictionCheck {
 
         if (player.isTickingReliablyFor(3)) {
             for (FlagData data : flags) {
-                flagAndAlert(V.write(verbose()).vi(data.action()).bool(data.sprinting()).bool(data.sneaking()), data.verbose());
+                flagAndAlert(V.write(verbose()).vi(data.action()).bool(data.sprinting()).bool(data.sneaking()));
             }
         }
 
         flags.clear();
     }
 
-    private record FlagData(String verbose, int action, boolean sprinting, boolean sneaking) {
+    private record FlagData(int action, boolean sprinting, boolean sneaking) {
     }
 }

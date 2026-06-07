@@ -29,14 +29,12 @@ public class PacketOrderP extends Check implements PacketCheck {
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.getPacketType() == PacketType.Play.Client.CHUNK_BATCH_ACK) {
             if (!transactions.rem(player.getLastTransactionReceived())) {
-                String verbose = verbose(KIND_INVALID_RESPONSE, "");
-                flagAndAlert(V.write(verbose()).vi(KIND_INVALID_RESPONSE).str(""), verbose);
+                flagAndAlert(V.write(verbose()).vi(KIND_INVALID_RESPONSE).str(""));
             }
         } else if (!isAsync(event.getPacketType()) && !isTransaction(event.getPacketType())) {
             if (transactions.rem(player.getLastTransactionReceived())) {
                 String packetType = event.getPacketType().toString();
-                String verbose = verbose(KIND_SKIPPED_RESPONSE, packetType);
-                flagAndAlert(V.write(verbose()).vi(KIND_SKIPPED_RESPONSE).str(packetType), verbose);
+                flagAndAlert(V.write(verbose()).vi(KIND_SKIPPED_RESPONSE).str(packetType));
             }
         }
     }
@@ -61,8 +59,7 @@ public class PacketOrderP extends Check implements PacketCheck {
             player.addRealTimeTaskNext(() -> {
                 if (transactions.rem(transaction)) {
                     String packetType = "TRANSACTION";
-                    String verbose = verbose(KIND_SKIPPED_RESPONSE, packetType);
-                    flagAndAlert(V.write(verbose()).vi(KIND_SKIPPED_RESPONSE).str(packetType), verbose);
+                    flagAndAlert(V.write(verbose()).vi(KIND_SKIPPED_RESPONSE).str(packetType));
                 }
             });
 

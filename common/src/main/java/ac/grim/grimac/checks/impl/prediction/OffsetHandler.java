@@ -46,10 +46,8 @@ public class OffsetHandler extends Check implements PostPredictionCheck {
             synchronized (flags) {
                 int flagId = (flags.get() & 255) + 1; // 1-256 as possible values
 
-                String humanFormattedOffset = humanFormattedOffset(offset);
-                String verbose = humanFormattedOffset + " /gl " + flagId;
                 if (flag(V.write(verbose()).f64(offset))) {
-                    if (alert(verbose)) {
+                    if (alert(() -> humanFormattedOffset(offset) + " /gl " + flagId)) {
                         flags.incrementAndGet(); // This debug was sent somewhere
                         predictionComplete.setIdentifier(flagId);
                     }

@@ -23,8 +23,7 @@ public class VehicleA extends Check implements PacketCheck {
             final WrapperPlayClientSteerVehicle packet = new WrapperPlayClientSteerVehicle(event);
 
             if (Math.abs(packet.getForward()) > 0.98f || Math.abs(packet.getSideways()) > 0.98f) {
-                String verbose = "forwards=" + packet.getForward() + ", sideways=" + packet.getSideways();
-                if (flagAndAlert(V.write(verbose()).f32(packet.getForward()).f32(packet.getSideways()), verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).f32(packet.getForward()).f32(packet.getSideways())) && shouldModifyPackets()) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }

@@ -84,7 +84,6 @@ public class PacketOrderI extends Check implements PostPredictionCheck {
             } else if (player.packetOrderProcessor.isReleasing() || player.packetOrderProcessor.isDigging()) {
                 boolean releasing = player.packetOrderProcessor.isReleasing();
                 boolean digging = player.packetOrderProcessor.isDigging();
-                String verbose = verbose(TYPE_INTERACT, false, false, false, releasing, digging);
                 if (!player.canSkipTicks()) {
                     if (flagAndAlert(V.write(verbose())
                             .vi(TYPE_INTERACT)
@@ -92,12 +91,12 @@ public class PacketOrderI extends Check implements PostPredictionCheck {
                             .bool(false)
                             .bool(false)
                             .bool(releasing)
-                            .bool(digging), verbose) && shouldModifyPackets()) {
+                            .bool(digging)) && shouldModifyPackets()) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }
                 } else {
-                    flags.add(new FlagData(verbose, TYPE_INTERACT, false, false, false, releasing, digging));
+                    flags.add(new FlagData(TYPE_INTERACT, false, false, false, releasing, digging));
                 }
             }
         }
@@ -105,7 +104,6 @@ public class PacketOrderI extends Check implements PostPredictionCheck {
         if (event.getPacketType() == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT || event.getPacketType() == PacketType.Play.Client.USE_ITEM) {
             if (player.packetOrderProcessor.isReleasing() || digging) {
                 boolean releasing = player.packetOrderProcessor.isReleasing();
-                String verbose = verbose(TYPE_PLACE_USE, false, false, false, releasing, digging);
                 if (!player.canSkipTicks()) {
                     if (flagAndAlert(V.write(verbose())
                             .vi(TYPE_PLACE_USE)
@@ -113,12 +111,12 @@ public class PacketOrderI extends Check implements PostPredictionCheck {
                             .bool(false)
                             .bool(false)
                             .bool(releasing)
-                            .bool(digging), verbose) && shouldModifyPackets()) {
+                            .bool(digging)) && shouldModifyPackets()) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }
                 } else {
-                    flags.add(new FlagData(verbose, TYPE_PLACE_USE, false, false, false, releasing, digging));
+                    flags.add(new FlagData(TYPE_PLACE_USE, false, false, false, releasing, digging));
                 }
             }
         }
@@ -140,7 +138,6 @@ public class PacketOrderI extends Check implements PostPredictionCheck {
                         boolean rightClicking = player.packetOrderProcessor.isRightClicking();
                         boolean picking = player.packetOrderProcessor.isPicking();
                         boolean digging = player.packetOrderProcessor.isDigging();
-                        String verbose = verbose(TYPE_RELEASE, attacking, rightClicking, picking, false, digging);
                         if (!player.canSkipTicks()) {
                             if (flagAndAlert(V.write(verbose())
                                     .vi(TYPE_RELEASE)
@@ -148,11 +145,11 @@ public class PacketOrderI extends Check implements PostPredictionCheck {
                                     .bool(rightClicking)
                                     .bool(picking)
                                     .bool(false)
-                                    .bool(digging), verbose)) {
+                                    .bool(digging))) {
                                 setback = true;
                             }
                         } else {
-                            flags.add(new FlagData(verbose, TYPE_RELEASE, attacking, rightClicking, picking, false, digging));
+                            flags.add(new FlagData(TYPE_RELEASE, attacking, rightClicking, picking, false, digging));
                             setback = true;
                         }
                     }
@@ -193,7 +190,7 @@ public class PacketOrderI extends Check implements PostPredictionCheck {
                         .bool(data.rightClicking())
                         .bool(data.picking())
                         .bool(data.releasing())
-                        .bool(data.digging()), data.verbose()) && setback) {
+                        .bool(data.digging())) && setback) {
                     setbackIfAboveSetbackVL();
                     setback = false;
                 }
@@ -210,7 +207,6 @@ public class PacketOrderI extends Check implements PostPredictionCheck {
             boolean picking = player.packetOrderProcessor.isPicking();
             boolean releasing = player.packetOrderProcessor.isReleasing();
             boolean digging = player.packetOrderProcessor.isDigging();
-            String verbose = verbose(TYPE_ATTACK, false, rightClicking, picking, releasing, digging);
             if (!player.canSkipTicks()) {
                 if (flagAndAlert(V.write(verbose())
                         .vi(TYPE_ATTACK)
@@ -218,12 +214,12 @@ public class PacketOrderI extends Check implements PostPredictionCheck {
                         .bool(rightClicking)
                         .bool(picking)
                         .bool(releasing)
-                        .bool(digging), verbose) && shouldModifyPackets()) {
+                        .bool(digging)) && shouldModifyPackets()) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }
             } else {
-                flags.add(new FlagData(verbose, TYPE_ATTACK, false, rightClicking, picking, releasing, digging));
+                flags.add(new FlagData(TYPE_ATTACK, false, rightClicking, picking, releasing, digging));
             }
         }
     }
@@ -234,7 +230,6 @@ public class PacketOrderI extends Check implements PostPredictionCheck {
     }
 
     private record FlagData(
-            String verbose,
             int type,
             boolean attacking,
             boolean rightClicking,

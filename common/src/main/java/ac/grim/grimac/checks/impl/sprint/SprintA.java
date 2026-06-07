@@ -27,8 +27,7 @@ public class SprintA extends Check implements PacketCheck {
 
         if (player.food <= 6.0F) {
             if (player.isSprinting) {
-                String verbose = "hunger=" + player.food;
-                if (flagAndAlert(V.write(verbose()).vi(player.food), verbose)) {
+                if (flagAndAlert(V.write(verbose()).vi(player.food))) {
                     if (shouldModifyPackets()) {
                         event.setCancelled(true);
                         player.onPacketCancel();

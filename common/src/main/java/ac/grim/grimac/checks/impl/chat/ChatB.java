@@ -29,7 +29,7 @@ public class ChatB extends Check implements PacketCheck {
             if (message.isEmpty() || !message.trim().equals(message)
                     || message.startsWith("/") && player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_19)) {
                 String verbose = "message=" + message;
-                if (flagAndAlert(V.write(verbose()).str(verbose), verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).str(verbose)) && shouldModifyPackets()) {
                     player.onPacketCancel();
                     event.setCancelled(true);
                 }
@@ -40,7 +40,7 @@ public class ChatB extends Check implements PacketCheck {
             String command = "/" + new WrapperPlayClientChatCommandUnsigned(event).getCommand();
             if (!command.stripTrailing().equals(command)) {
                 String verbose = "command=" + command;
-                if (flagAndAlert(V.write(verbose()).str(verbose), verbose)) {
+                if (flagAndAlert(V.write(verbose()).str(verbose))) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }
@@ -51,7 +51,7 @@ public class ChatB extends Check implements PacketCheck {
             String command = "/" + new WrapperPlayClientChatCommand(event).getCommand();
             if (!command.trim().equals(command)) {
                 String verbose = "command=" + command;
-                if (flagAndAlert(V.write(verbose()).str(verbose), verbose)) {
+                if (flagAndAlert(V.write(verbose()).str(verbose))) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }

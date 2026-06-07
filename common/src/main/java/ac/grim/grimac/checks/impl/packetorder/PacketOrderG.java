@@ -87,7 +87,6 @@ public class PacketOrderG extends Check implements PostPredictionCheck {
                 boolean rightClicking = player.packetOrderProcessor.isRightClicking();
                 boolean picking = player.packetOrderProcessor.isPicking();
                 boolean digging = player.packetOrderProcessor.isDigging();
-                String verbose = verbose(actionKind, attacking, releasing, rightClicking, picking, digging);
                 if (!player.canSkipTicks()) {
                     if (flagAndAlert(V.write(verbose())
                             .vi(actionKind)
@@ -95,12 +94,12 @@ public class PacketOrderG extends Check implements PostPredictionCheck {
                             .bool(releasing)
                             .bool(rightClicking)
                             .bool(picking)
-                            .bool(digging), verbose) && shouldModifyPackets() && canCancel(action)) {
+                            .bool(digging)) && shouldModifyPackets() && canCancel(action)) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }
                 } else {
-                    flags.add(new FlagData(verbose, actionKind, attacking, releasing, rightClicking, picking, digging));
+                    flags.add(new FlagData(actionKind, attacking, releasing, rightClicking, picking, digging));
                 }
             }
         }
@@ -118,7 +117,7 @@ public class PacketOrderG extends Check implements PostPredictionCheck {
                         .bool(data.releasing())
                         .bool(data.rightClicking())
                         .bool(data.picking())
-                        .bool(data.digging()), data.verbose());
+                        .bool(data.digging()));
             }
         }
 
@@ -126,7 +125,6 @@ public class PacketOrderG extends Check implements PostPredictionCheck {
     }
 
     private record FlagData(
-            String verbose,
             int action,
             boolean attacking,
             boolean releasing,

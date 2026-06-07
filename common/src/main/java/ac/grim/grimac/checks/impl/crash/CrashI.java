@@ -33,8 +33,7 @@ public class CrashI extends Check implements PacketCheck {
             }
 
             if (selectedItemIndex < -1) {
-                String verbose = "selectedItemIndex=" + selectedItemIndex;
-                flagAndAlert(V.write(verbose()).zz(selectedItemIndex), verbose);
+                flagAndAlert(V.write(verbose()).zz(selectedItemIndex));
                 event.setCancelled(true);
                 player.onPacketCancel();
             }

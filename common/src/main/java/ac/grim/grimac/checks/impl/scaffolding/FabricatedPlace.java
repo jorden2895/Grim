@@ -65,8 +65,7 @@ public class FabricatedPlace extends BlockPlaceCheck {
             // Alert logic
             double limit = minBound - MAX_DOUBLE_ERROR;
             String cursorText = String.valueOf(cursor);
-            String debug = String.format("cursor=%s limit=%.16f", cursorText, limit);
-            if (flagAndAlert(V.write(verbose()).str(cursorText).f64(limit), debug) && shouldModifyPackets() && shouldCancel()) {
+            if (flagAndAlert(V.write(verbose()).str(cursorText).f64(limit)) && shouldModifyPackets() && shouldCancel()) {
                 place.resync();
             }
             return;
@@ -90,8 +89,7 @@ public class FabricatedPlace extends BlockPlaceCheck {
             // Alert logic
             double limit = maxBound + upperTolerance;
             String cursorText = String.valueOf(cursor);
-            String debug = String.format("cursor=%s limit=%.16f", cursorText, limit);
-            if (flagAndAlert(V.write(verbose()).str(cursorText).f64(limit), debug) && shouldModifyPackets() && shouldCancel()) {
+            if (flagAndAlert(V.write(verbose()).str(cursorText).f64(limit)) && shouldModifyPackets() && shouldCancel()) {
                 place.resync();
             }
         }

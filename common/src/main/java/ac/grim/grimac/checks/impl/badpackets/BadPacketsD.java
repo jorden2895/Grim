@@ -25,8 +25,7 @@ public class BadPacketsD extends Check implements PacketCheck {
             final float pitch = new WrapperPlayClientPlayerFlying(event).getLocation().getPitch();
             if (pitch > 90 || pitch < -90) {
                 // Ban.
-                String verbose = "pitch=" + pitch;
-                if (flagAndAlert(V.write(verbose()).f32(pitch), verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).f32(pitch)) && shouldModifyPackets()) {
                     // prevent other checks from using an invalid pitch
                     if (player.pitch > 90) player.pitch = 90;
                     if (player.pitch < -90) player.pitch = -90;

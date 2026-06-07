@@ -25,8 +25,7 @@ public class InvalidPlaceB extends BlockPlaceCheck {
         if (place.getFaceId() < 0 || place.getFaceId() > 5) {
             // ban
             int direction = place.getFaceId();
-            String verbose = "direction=" + direction;
-            if (flagAndAlert(V.write(verbose()).zz(direction), verbose) && shouldModifyPackets() && shouldCancel()) {
+            if (flagAndAlert(V.write(verbose()).zz(direction)) && shouldModifyPackets() && shouldCancel()) {
                 place.resync();
             }
         }

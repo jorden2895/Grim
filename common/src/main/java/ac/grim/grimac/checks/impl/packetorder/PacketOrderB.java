@@ -79,8 +79,7 @@ public class PacketOrderB extends Check implements PacketCheck {
 
         if (!isAsync(event.getPacketType())) {
             if (sentAttack && is1_9) {
-                String verbose = verbose(ACTION_POST_ATTACK);
-                flagAndAlert(V.write(verbose()).vi(ACTION_POST_ATTACK), verbose);
+                flagAndAlert(V.write(verbose()).vi(ACTION_POST_ATTACK));
             }
 
             sentAttack = sentAnimation = sentSlotSwitch = false;
@@ -94,8 +93,7 @@ public class PacketOrderB extends Check implements PacketCheck {
 
         if (is1_9 ? !sentAnimationSinceLastAttack : !sentAnimation) {
             sentAttack = false; // don't flag twice
-            String verbose = verbose(ACTION_PRE_ATTACK);
-            if (flagAndAlert(V.write(verbose()).vi(ACTION_PRE_ATTACK), verbose) && shouldModifyPackets()) {
+            if (flagAndAlert(V.write(verbose()).vi(ACTION_PRE_ATTACK)) && shouldModifyPackets()) {
                 event.setCancelled(true);
                 player.onPacketCancel();
             }

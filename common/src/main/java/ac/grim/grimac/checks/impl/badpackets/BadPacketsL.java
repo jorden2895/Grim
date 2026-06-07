@@ -50,12 +50,7 @@ public class BadPacketsL extends Check implements PacketCheck {
                 int face = packet.getBlockFaceId();
                 int sequence = packet.getSequence();
                 String action = packet.getAction().toString().toLowerCase(Locale.ROOT);
-                String verbose = "pos="
-                        + x + ", " + y + ", " + z
-                        + ", face=" + face
-                        + ", sequence=" + sequence
-                        + ", action=" + action;
-                if (flagAndAlert(V.write(verbose()).zz(x).zz(y).zz(z).zz(face).zz(sequence).str(action), verbose)
+                if (flagAndAlert(V.write(verbose()).zz(x).zz(y).zz(z).zz(face).zz(sequence).str(action))
                         && shouldModifyPackets() && canCancel(packet.getAction())) {
                     event.setCancelled(true);
                     player.onPacketCancel();

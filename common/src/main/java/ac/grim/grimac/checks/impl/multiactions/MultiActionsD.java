@@ -25,8 +25,7 @@ public class MultiActionsD extends Check implements PacketCheck {
         boolean sprinting = MultiActionsC.isVerboseSprinting(player);
         boolean sneaking = MultiActionsC.isVerboseSneaking(player);
         boolean input = MultiActionsC.isVerboseInput(player);
-        String verbose = MultiActionsC.getVerbose(sprinting, sneaking, input);
-        if (verbose.isEmpty()) return;
+        if (!sprinting && !sneaking && !input) return;
 
         // The client force-closes the inventory while inside a nether portal, sending this close
         // window packet even while moving. This only happens on 1.12.2 and newer clients.
@@ -35,6 +34,6 @@ public class MultiActionsD extends Check implements PacketCheck {
         // Don't cancel this packet, because it won't do anything except for making chests
         // look like they are still open (desynced),
         // and it can cause incompatibility issues with plugins
-        flagAndAlert(V.write(verbose()).bool(sprinting).bool(sneaking).bool(input), verbose);
+        flagAndAlert(V.write(verbose()).bool(sprinting).bool(sneaking).bool(input));
     }
 }

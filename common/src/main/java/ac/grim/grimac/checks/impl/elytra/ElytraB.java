@@ -28,8 +28,7 @@ public class ElytraB extends Check implements PostPredictionCheck {
                 && player.supportsEndTick()
         ) {
             if (player.packetStateData.knownInput.jump()) {
-                String verbose = "no release";
-                if (flagAndAlert(V.write(verbose()).bool(true), verbose)) {
+                if (flagAndAlert(V.write(verbose()).bool(true))) {
                     setback = true;
                     if (shouldModifyPackets()) {
                         event.setCancelled(true);
@@ -43,8 +42,7 @@ public class ElytraB extends Check implements PostPredictionCheck {
         }
 
         if (isUpdate(event.getPacketType())) {
-            String verbose = "no jump";
-            if (glide && !player.packetStateData.knownInput.jump() && flagAndAlert(V.write(verbose()).bool(false), verbose)) {
+            if (glide && !player.packetStateData.knownInput.jump() && flagAndAlert(V.write(verbose()).bool(false))) {
                 setback = true;
             }
 

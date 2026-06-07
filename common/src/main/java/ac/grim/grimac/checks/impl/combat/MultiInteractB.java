@@ -37,15 +37,14 @@ public class MultiInteractB extends Check implements PostPredictionCheck {
             if (pos == null) return; // shouldn't ever happen, but whatever
 
             if (hasInteracted && !pos.equals(lastPos)) {
-                String verbose = "pos=" + MessageUtil.toUnlabledString(pos) + ", lastPos=" + MessageUtil.toUnlabledString(lastPos);
                 if (!player.canSkipTicks()) {
-                    if (flagAndAlert(V.write(verbose()).f64(pos.x).f64(pos.y).f64(pos.z).f64(lastPos.x).f64(lastPos.y).f64(lastPos.z), verbose)
+                    if (flagAndAlert(V.write(verbose()).f64(pos.x).f64(pos.y).f64(pos.z).f64(lastPos.x).f64(lastPos.y).f64(lastPos.z))
                             && shouldModifyPackets()) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }
                 } else {
-                    flags.add(new FlagData(verbose, pos.x, pos.y, pos.z, lastPos.x, lastPos.y, lastPos.z));
+                    flags.add(new FlagData(pos.x, pos.y, pos.z, lastPos.x, lastPos.y, lastPos.z));
                 }
             }
 
@@ -64,10 +63,9 @@ public class MultiInteractB extends Check implements PostPredictionCheck {
 
         if (player.isTickingReliablyFor(3)) {
             for (FlagData data : flags) {
-                String verbose = data.verbose();
                 flagAndAlert(V.write(verbose())
                         .f64(data.posX()).f64(data.posY()).f64(data.posZ())
-                        .f64(data.lastPosX()).f64(data.lastPosY()).f64(data.lastPosZ()), verbose);
+                        .f64(data.lastPosX()).f64(data.lastPosY()).f64(data.lastPosZ()));
             }
         }
 
@@ -75,7 +73,6 @@ public class MultiInteractB extends Check implements PostPredictionCheck {
     }
 
     private record FlagData(
-            String verbose,
             double posX,
             double posY,
             double posZ,

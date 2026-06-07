@@ -25,16 +25,14 @@ public class TickTimer extends Check implements PacketCheck {
     public void onPacketReceive(PacketReceiveEvent event) {
         if (!player.supportsEndTick()) return;
         if (isFlying(event.getPacketType()) && !player.packetStateData.lastPacketWasTeleport) {
-            String verbose = "type=flying, packets=" + flyingPackets;
-            if (!receivedTickEnd && flagAndAlertWithSetback(V.write(verbose()).bool(false).vi(flyingPackets), verbose)) {
+            if (!receivedTickEnd && flagAndAlertWithSetback(V.write(verbose()).bool(false).vi(flyingPackets))) {
                 handleViolation();
             }
             receivedTickEnd = false;
             flyingPackets++;
         } else if (event.getPacketType() == PacketType.Play.Client.CLIENT_TICK_END) {
             receivedTickEnd = true;
-            String verbose = "type=end, packets=" + flyingPackets;
-            if (flyingPackets > 1 && flagAndAlertWithSetback(V.write(verbose()).bool(true).vi(flyingPackets), verbose)) {
+            if (flyingPackets > 1 && flagAndAlertWithSetback(V.write(verbose()).bool(true).vi(flyingPackets))) {
                 handleViolation();
             }
             flyingPackets = 0;

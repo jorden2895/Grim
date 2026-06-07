@@ -1,5 +1,6 @@
 package ac.grim.grimac.checks.impl.scaffolding;
 
+import ac.grim.grimac.api.storage.verbose.VerboseSchema;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.type.BlockPlaceCheck;
 import ac.grim.grimac.player.GrimPlayer;
@@ -14,9 +15,12 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import java.util.ArrayList;
 import java.util.List;
 
-@CheckData(name = "MultiPlace", stableKey = "grim.scaffolding.multi_place", description = "Placed multiple blocks in a tick", experimental = true)
+@CheckData(name = "MultiPlace", stableKey = "grim.scaffolding.multi_place", verboseVersion = 1, description = "Placed multiple blocks in a tick", experimental = true)
 public class MultiPlace extends BlockPlaceCheck {
-    private final List<String> flags = new ArrayList<>();
+    public static final VerboseSchema V = VerboseSchema.of(
+            "face:str", "lastFace:str", "cursor:str", "lastCursor:str", "pos:str", "lastPos:str");
+
+    private final List<FlagData> flags = new ArrayList<>();
     private boolean hasPlaced;
     private BlockFace lastFace;
     private Vector3f lastCursor;
@@ -33,15 +37,22 @@ public class MultiPlace extends BlockPlaceCheck {
         final Vector3i pos = place.position;
 
         if (hasPlaced && (face != lastFace || !cursor.equals(lastCursor) || !pos.equals(lastPos))) {
-            final String verbose = "face=" + face + ", lastFace=" + lastFace
-                    + ", cursor=" + MessageUtil.toUnlabledString(cursor) + ", lastCursor=" + MessageUtil.toUnlabledString(lastCursor)
-                    + ", pos=" + MessageUtil.toUnlabledString(pos) + ", lastPos=" + MessageUtil.toUnlabledString(lastPos);
+            final String faceName = String.valueOf(face);
+            final String lastFaceName = String.valueOf(lastFace);
+            final String cursorText = MessageUtil.toUnlabledString(cursor);
+            final String lastCursorText = MessageUtil.toUnlabledString(lastCursor);
+            final String posText = MessageUtil.toUnlabledString(pos);
+            final String lastPosText = MessageUtil.toUnlabledString(lastPos);
+            final String verbose = "face=" + faceName + ", lastFace=" + lastFaceName
+                    + ", cursor=" + cursorText + ", lastCursor=" + lastCursorText
+                    + ", pos=" + posText + ", lastPos=" + lastPosText;
             if (!player.canSkipTicks()) {
-                if (flagAndAlert(verbose) && shouldModifyPackets() && shouldCancel()) {
+                if (flagAndAlert(V.write(verbose()).str(faceName).str(lastFaceName).str(cursorText).str(lastCursorText).str(posText).str(lastPosText), verbose)
+                        && shouldModifyPackets() && shouldCancel()) {
                     place.resync();
                 }
             } else {
-                flags.add(verbose);
+                flags.add(new FlagData(verbose, faceName, lastFaceName, cursorText, lastCursorText, posText, lastPosText));
             }
         }
 
@@ -63,11 +74,22 @@ public class MultiPlace extends BlockPlaceCheck {
         if (!player.canSkipTicks()) return;
 
         if (player.isTickingReliablyFor(3)) {
-            for (String verbose : flags) {
-                flagAndAlert(verbose);
+            for (FlagData data : flags) {
+                String verbose = data.verbose();
+                flagAndAlert(V.write(verbose()).str(data.face()).str(data.lastFace()).str(data.cursor()).str(data.lastCursor()).str(data.pos()).str(data.lastPos()), verbose);
             }
         }
 
         flags.clear();
+    }
+
+    private record FlagData(
+            String verbose,
+            String face,
+            String lastFace,
+            String cursor,
+            String lastCursor,
+            String pos,
+            String lastPos) {
     }
 }

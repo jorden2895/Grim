@@ -1,5 +1,6 @@
 package ac.grim.grimac.checks.impl.scaffolding;
 
+import ac.grim.grimac.api.storage.verbose.VerboseSchema;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.type.BlockPlaceCheck;
 import ac.grim.grimac.player.GrimPlayer;
@@ -20,8 +21,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@CheckData(name = "RotationPlace", stableKey = "grim.scaffolding.rotation_place", description = "Placed a block while not looking at it")
+@CheckData(name = "RotationPlace", stableKey = "grim.scaffolding.rotation_place", verboseVersion = 1, description = "Placed a block while not looking at it")
 public class RotationPlace extends BlockPlaceCheck {
+    public static final VerboseSchema V = VerboseSchema.of("preFlying:bool");
+
     private double flagBuffer = 0; // If the player flags once, force them to play legit, or we will cancel the tick before.
     private boolean ignorePost = false;
 
@@ -38,7 +41,8 @@ public class RotationPlace extends BlockPlaceCheck {
         if (flagBuffer > 0 && !didRayTraceHit(place)) {
             ignorePost = true;
             // If the player hit and has flagged this check recently
-            if (flagAndAlert("pre-flying") && shouldModifyPackets() && shouldCancel()) {
+            String verbose = "pre-flying";
+            if (flagAndAlert(V.write(verbose()).bool(true), verbose) && shouldModifyPackets() && shouldCancel()) {
                 place.resync();  // Deny the block placement.
             }
         }
@@ -63,7 +67,8 @@ public class RotationPlace extends BlockPlaceCheck {
         // This can false with rapidly moving yaw in 1.8+ clients
         if (!hit) {
             flagBuffer = 1;
-            flagAndAlert("post-flying");
+            String verbose = "post-flying";
+            flagAndAlert(V.write(verbose()).bool(false), verbose);
         } else {
             flagBuffer = Math.max(0, flagBuffer - 0.1);
         }

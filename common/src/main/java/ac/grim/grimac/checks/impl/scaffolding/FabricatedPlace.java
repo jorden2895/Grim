@@ -1,5 +1,6 @@
 package ac.grim.grimac.checks.impl.scaffolding;
 
+import ac.grim.grimac.api.storage.verbose.VerboseSchema;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.type.BlockPlaceCheck;
 import ac.grim.grimac.player.GrimPlayer;
@@ -8,8 +9,9 @@ import ac.grim.grimac.utils.nmsutil.Materials;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.util.Vector3f;
 
-@CheckData(name = "FabricatedPlace", stableKey = "grim.scaffolding.fabricated_place", description = "Sent out of bounds cursor position")
+@CheckData(name = "FabricatedPlace", stableKey = "grim.scaffolding.fabricated_place", verboseVersion = 1, description = "Sent out of bounds cursor position")
 public class FabricatedPlace extends BlockPlaceCheck {
+    public static final VerboseSchema V = VerboseSchema.of("cursor:str", "limit:f64");
 
     /**
      * MAX_DOUBLE_ERROR:
@@ -61,8 +63,10 @@ public class FabricatedPlace extends BlockPlaceCheck {
                 cursor.getZ() < minBound - MAX_DOUBLE_ERROR) {
 
             // Alert logic
-            String debug = String.format("cursor=%s limit=%.16f", cursor, minBound - MAX_DOUBLE_ERROR);
-            if (flagAndAlert(debug) && shouldModifyPackets() && shouldCancel()) {
+            double limit = minBound - MAX_DOUBLE_ERROR;
+            String cursorText = String.valueOf(cursor);
+            String debug = String.format("cursor=%s limit=%.16f", cursorText, limit);
+            if (flagAndAlert(V.write(verbose()).str(cursorText).f64(limit), debug) && shouldModifyPackets() && shouldCancel()) {
                 place.resync();
             }
             return;
@@ -84,8 +88,10 @@ public class FabricatedPlace extends BlockPlaceCheck {
                 cursor.getZ() > maxBound + upperTolerance) {
 
             // Alert logic
-            String debug = String.format("cursor=%s limit=%.16f", cursor, maxBound + upperTolerance);
-            if (flagAndAlert(debug) && shouldModifyPackets() && shouldCancel()) {
+            double limit = maxBound + upperTolerance;
+            String cursorText = String.valueOf(cursor);
+            String debug = String.format("cursor=%s limit=%.16f", cursorText, limit);
+            if (flagAndAlert(V.write(verbose()).str(cursorText).f64(limit), debug) && shouldModifyPackets() && shouldCancel()) {
                 place.resync();
             }
         }

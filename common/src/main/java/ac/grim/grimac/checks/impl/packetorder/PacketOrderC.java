@@ -1,5 +1,6 @@
 package ac.grim.grimac.checks.impl.packetorder;
 
+import ac.grim.grimac.api.storage.verbose.VerboseSchema;
 import ac.grim.grimac.checks.Check;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.type.PacketCheck;
@@ -13,8 +14,22 @@ import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 
-@CheckData(name = "PacketOrderC", stableKey = "grim.packetorder.interact_order")
+@CheckData(name = "PacketOrderC", stableKey = "grim.packetorder.interact_order", verboseVersion = 1)
 public class PacketOrderC extends Check implements PacketCheck {
+    public static final VerboseSchema V = VerboseSchema.of(
+            "kind:vi",
+            "requiredEntity:zz",
+            "entity:zz",
+            "requiredHand:str",
+            "hand:str",
+            "requiredSneaking:bool",
+            "sneaking:bool");
+
+    static final int KIND_SKIPPED_INTERACT_AT = 0;
+    static final int KIND_MISMATCH = 1;
+    static final int KIND_SKIPPED_INTERACT = 2;
+    static final int KIND_SKIPPED_INTERACT_TICK = 3;
+
     private final boolean exempt = player.getClientVersion().isOlderThanOrEquals(ClientVersion.V_1_7_10) // 1.7 players do not send INTERACT_AT
             || player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_26_1); // 26.1 players do not send INTERACT
     private boolean sentInteractAt = false;
@@ -24,6 +39,15 @@ public class PacketOrderC extends Check implements PacketCheck {
 
     public PacketOrderC(final GrimPlayer player) {
         super(player);
+    }
+
+    static String literal(int kind) {
+        return switch (kind) {
+            case KIND_SKIPPED_INTERACT_AT -> "Skipped Interact-At";
+            case KIND_SKIPPED_INTERACT -> "Skipped Interact";
+            case KIND_SKIPPED_INTERACT_TICK -> "Skipped Interact (Tick)";
+            default -> "unknown";
+        };
     }
 
     @Override
@@ -49,15 +73,32 @@ public class PacketOrderC extends Check implements PacketCheck {
                 // INTERACT_AT then INTERACT
                 case INTERACT:
                     if (!sentInteractAt) {
-                        if (flagAndAlert("Skipped Interact-At") && shouldModifyPackets()) {
+                        String verbose = literal(KIND_SKIPPED_INTERACT_AT);
+                        if (flagAndAlert(V.write(verbose())
+                                .vi(KIND_SKIPPED_INTERACT_AT)
+                                .zz(0)
+                                .zz(0)
+                                .str("")
+                                .str("")
+                                .bool(false)
+                                .bool(false), verbose) && shouldModifyPackets()) {
                             event.setCancelled(true);
                             player.onPacketCancel();
                         }
                     } else if (packet.getEntityId() != requiredEntity || packet.getHand() != requiredHand || sneaking != requiredSneaking) {
+                        String requiredHandName = String.valueOf(requiredHand);
+                        String handName = String.valueOf(packet.getHand());
                         String verbose = "requiredEntity=" + requiredEntity + ", entity=" + packet.getEntityId()
-                                + ", requiredHand=" + requiredHand + ", hand=" + packet.getHand()
+                                + ", requiredHand=" + requiredHandName + ", hand=" + handName
                                 + ", requiredSneaking=" + requiredSneaking + ", sneaking=" + sneaking;
-                        if (flagAndAlert(verbose) && shouldModifyPackets()) {
+                        if (flagAndAlert(V.write(verbose())
+                                .vi(KIND_MISMATCH)
+                                .zz(requiredEntity)
+                                .zz(packet.getEntityId())
+                                .str(requiredHandName)
+                                .str(handName)
+                                .bool(requiredSneaking)
+                                .bool(sneaking), verbose) && shouldModifyPackets()) {
                             event.setCancelled(true);
                             player.onPacketCancel();
                         }
@@ -67,7 +108,15 @@ public class PacketOrderC extends Check implements PacketCheck {
                     break;
                 case INTERACT_AT:
                     if (sentInteractAt) {
-                        if (flagAndAlert("Skipped Interact") && shouldModifyPackets()) {
+                        String verbose = literal(KIND_SKIPPED_INTERACT);
+                        if (flagAndAlert(V.write(verbose())
+                                .vi(KIND_SKIPPED_INTERACT)
+                                .zz(0)
+                                .zz(0)
+                                .str("")
+                                .str("")
+                                .bool(false)
+                                .bool(false), verbose) && shouldModifyPackets()) {
                             event.setCancelled(true);
                             player.onPacketCancel();
                         }
@@ -84,7 +133,15 @@ public class PacketOrderC extends Check implements PacketCheck {
         if (WrapperPlayClientPlayerFlying.isFlying(event.getPacketType())) {
             if (sentInteractAt) {
                 sentInteractAt = false;
-                flagAndAlert("Skipped Interact (Tick)");
+                String verbose = literal(KIND_SKIPPED_INTERACT_TICK);
+                flagAndAlert(V.write(verbose())
+                        .vi(KIND_SKIPPED_INTERACT_TICK)
+                        .zz(0)
+                        .zz(0)
+                        .str("")
+                        .str("")
+                        .bool(false)
+                        .bool(false), verbose);
             }
         }
     }

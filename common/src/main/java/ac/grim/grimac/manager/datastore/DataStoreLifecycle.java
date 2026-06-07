@@ -5,6 +5,7 @@ import ac.grim.grimac.api.plugin.GrimPlugin;
 import ac.grim.grimac.checks.Check;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.impl.badpackets.BadPacketsVerbose;
+import ac.grim.grimac.checks.impl.baritone.BaritoneVerbose;
 import ac.grim.grimac.checks.impl.breaking.BreakingVerbose;
 import ac.grim.grimac.checks.impl.chat.ChatVerbose;
 import ac.grim.grimac.checks.impl.combat.CombatVerbose;
@@ -14,6 +15,7 @@ import ac.grim.grimac.checks.impl.elytra.ElytraVerbose;
 import ac.grim.grimac.checks.impl.exploit.ExploitVerbose;
 import ac.grim.grimac.checks.impl.misc.MiscVerbose;
 import ac.grim.grimac.checks.impl.multiactions.MultiActionsVerbose;
+import ac.grim.grimac.checks.impl.packetorder.PacketOrderVerbose;
 import ac.grim.grimac.checks.impl.prediction.GroundSpoof;
 import ac.grim.grimac.checks.impl.prediction.OffsetHandler;
 import ac.grim.grimac.checks.impl.scaffolding.ScaffoldingVerbose;
@@ -365,6 +367,7 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
                 checkRegistry,
                 VerboseManifest.FLAVOR_V2_PUBLIC);
         BadPacketsVerbose.register(registry, checkRegistry);
+        BaritoneVerbose.register(registry, checkRegistry);
         BreakingVerbose.register(registry, checkRegistry);
         CrashVerbose.register(registry, checkRegistry);
         ScaffoldingVerbose.register(registry, checkRegistry);
@@ -378,6 +381,7 @@ public final class DataStoreLifecycle implements StartableInitable, StoppableIni
         SprintVerbose.register(registry, checkRegistry);
         MiscVerbose.register(registry, checkRegistry);
         ElytraVerbose.register(registry, checkRegistry);
+        PacketOrderVerbose.register(registry, checkRegistry);
         registerVerboseSchema(registry, OffsetHandler.class, OffsetHandler.V);
         registerVerboseFormatter(registry, OffsetHandler.class, simulationFormatter());
         registerVerboseSchema(registry, GroundSpoof.class, GroundSpoof.V);

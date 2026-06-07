@@ -1,5 +1,6 @@
 package ac.grim.grimac.checks.impl.packetorder;
 
+import ac.grim.grimac.api.storage.verbose.VerboseSchema;
 import ac.grim.grimac.checks.Check;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.type.PostPredictionCheck;
@@ -10,8 +11,10 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 
 import java.util.ArrayDeque;
 
-@CheckData(name = "PacketOrderE", stableKey = "grim.packetorder.slot_order", experimental = true)
+@CheckData(name = "PacketOrderE", stableKey = "grim.packetorder.slot_order", experimental = true, verboseVersion = 1)
 public class PacketOrderE extends Check implements PostPredictionCheck {
+    public static final VerboseSchema V = VerboseSchema.of("verbose:str");
+
     public PacketOrderE(final GrimPlayer player) {
         super(player);
     }
@@ -42,7 +45,7 @@ public class PacketOrderE extends Check implements PostPredictionCheck {
                         + ", sprinting=" + player.packetOrderProcessor.isSprinting()
                         + ", gliding=" + player.packetOrderProcessor.isStartingToGlide()
                         + ", mountJumping=" + player.packetOrderProcessor.isJumpingWithMount();
-                if (player.canSkipTicks() && flags.add(verbose) || flagAndAlert(verbose)) {
+                if (player.canSkipTicks() && flags.add(verbose) || flagAndAlert(V.write(verbose()).str(verbose), verbose)) {
                     if (player.packetOrderProcessor.isUsing()) {
                         setback = true;
                     }
@@ -63,7 +66,7 @@ public class PacketOrderE extends Check implements PostPredictionCheck {
 
         if (player.isTickingReliablyFor(3)) {
             for (String verbose : flags) {
-                if (flagAndAlert(verbose) && setback) {
+                if (flagAndAlert(V.write(verbose()).str(verbose), verbose) && setback) {
                     setback = false;
                     setbackIfAboveSetbackVL();
                 }

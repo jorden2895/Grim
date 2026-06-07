@@ -43,7 +43,7 @@ public class FarBreak extends Check implements BlockBreakCheck {
         if (min > maxReach * maxReach) {
             double distance = Math.sqrt(min);
             String verbose = String.format("distance=%.2f", distance);
-            if (flag(V.write(verbose()).f64(distance)) && alert(verbose) && shouldModifyPackets()) {
+            if (flagAndAlert(V.write(verbose()).f64(distance), verbose) && shouldModifyPackets()) {
                 blockBreak.cancel();
             }
         }

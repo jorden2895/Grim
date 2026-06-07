@@ -55,11 +55,11 @@ public class BadPacketsU extends Check implements PacketCheck {
                             "xyz=%s, %s, %s, cursor=%s, %s, %s, item=%s, sequence=%s",
                             pos.x, pos.y, pos.z, cursor.x, cursor.y, cursor.z, !failedItemCheck, packet.getSequence()
                     );
-                    if (flag(V.write(verbose())
+                    if (flagAndAlert(V.write(verbose())
                             .zz(pos.x).zz(pos.y).zz(pos.z)
                             .f32(cursor.x).f32(cursor.y).f32(cursor.z)
-                            .bool(!failedItemCheck).zz(packet.getSequence()))
-                            && alert(verbose) && shouldModifyPackets()) {
+                            .bool(!failedItemCheck).zz(packet.getSequence()), verbose)
+                            && shouldModifyPackets()) {
                         player.onPacketCancel();
                         event.setCancelled(true);
                     }

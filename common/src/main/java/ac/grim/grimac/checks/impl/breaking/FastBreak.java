@@ -86,7 +86,7 @@ public class FastBreak extends Check implements BlockBreakCheck {
             if (blockDelayBalance > 1000) { // If more than a second of advantage
                 String type = String.valueOf(blockBreak.block.getType());
                 String verbose = "delay=" + breakDelay + "ms, type=" + type;
-                if (flag(V.write(verbose()).bool(true).vl((long) breakDelay).f64(0).f64(0).str(type)) && alert(verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).bool(true).vl((long) breakDelay).f64(0).f64(0).str(type), verbose) && shouldModifyPackets()) {
                     blockBreak.cancel();
                 }
             }
@@ -110,7 +110,7 @@ public class FastBreak extends Check implements BlockBreakCheck {
             if (blockBreakBalance > 1000) { // If more than a second of advantage
                 String type = String.valueOf(blockBreak.block.getType());
                 String verbose = "diff=" + diff + "ms, balance=" + blockBreakBalance + "ms, type=" + type;
-                if (flag(V.write(verbose()).bool(false).vl(0).f64(diff).f64(blockBreakBalance).str(type)) && alert(verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).bool(false).vl(0).f64(diff).f64(blockBreakBalance).str(type), verbose) && shouldModifyPackets()) {
                     blockBreak.cancel();
                 }
             }

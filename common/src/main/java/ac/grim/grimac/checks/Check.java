@@ -90,6 +90,14 @@ public class Check extends GrimProcessor implements AbstractCheck {
         return false;
     }
 
+    public final boolean flagAndAlert(@NotNull VerboseBuf verbose, String alertText) {
+        if (flag(verbose)) {
+            alert(alertText);
+            return true;
+        }
+        return false;
+    }
+
     public final boolean flagAndAlert() {
         return flagAndAlert("");
     }
@@ -151,6 +159,14 @@ public class Check extends GrimProcessor implements AbstractCheck {
 
     public final boolean flagAndAlertWithSetback(String verbose) {
         if (flagAndAlert(verbose)) {
+            setbackIfAboveSetbackVL();
+            return true;
+        }
+        return false;
+    }
+
+    public final boolean flagAndAlertWithSetback(@NotNull VerboseBuf verbose, String alertText) {
+        if (flagAndAlert(verbose, alertText)) {
             setbackIfAboveSetbackVL();
             return true;
         }

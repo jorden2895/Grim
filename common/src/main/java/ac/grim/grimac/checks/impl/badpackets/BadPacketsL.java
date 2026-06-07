@@ -55,8 +55,8 @@ public class BadPacketsL extends Check implements PacketCheck {
                         + ", face=" + face
                         + ", sequence=" + sequence
                         + ", action=" + action;
-                if (flag(V.write(verbose()).zz(x).zz(y).zz(z).zz(face).zz(sequence).str(action))
-                        && alert(verbose) && shouldModifyPackets() && canCancel(packet.getAction())) {
+                if (flagAndAlert(V.write(verbose()).zz(x).zz(y).zz(z).zz(face).zz(sequence).str(action), verbose)
+                        && shouldModifyPackets() && canCancel(packet.getAction())) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }

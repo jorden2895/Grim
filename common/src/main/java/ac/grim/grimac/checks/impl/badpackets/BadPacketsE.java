@@ -32,9 +32,7 @@ public class BadPacketsE extends Check implements PacketCheck {
         } else if (WrapperPlayClientPlayerFlying.isFlying(event.getPacketType()) && !player.packetStateData.lastPacketWasTeleport) {
             if (++noReminderTicks > maxNoReminderTicks) {
                 String verbose = "ticks=" + noReminderTicks;
-                if (flag(V.write(verbose()).vi(noReminderTicks))) {
-                    alert(verbose);
-                }
+                flagAndAlert(V.write(verbose()).vi(noReminderTicks), verbose);
             }
         } else if (event.getPacketType() == PacketType.Play.Client.STEER_VEHICLE
                 || (isViaPleaseStopUsingProtocolHacksOnYourServer && player.inVehicle())) {

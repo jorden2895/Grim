@@ -70,9 +70,7 @@ public class BadPacketsT extends Check implements PacketCheck {
             final String verbose = String.format("%.5f/%.5f/%.5f",
                     targetVector.x, targetVector.y, targetVector.z);
             // We could pretty much ban the player at this point
-            if (flag(V.write(verbose()).f64(targetVector.x).f64(targetVector.y).f64(targetVector.z))) {
-                alert(verbose);
-            }
+            flagAndAlert(V.write(verbose()).f64(targetVector.x).f64(targetVector.y).f64(targetVector.z), verbose);
         }
     }
 }

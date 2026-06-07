@@ -68,7 +68,7 @@ public class AirLiquidBreak extends Check implements BlockBreakCheck {
             String blockName = block.getName();
             String action = String.valueOf(blockBreak.action);
             String verbose = "block=" + blockName + ", type=" + action;
-            if (flag(V.write(verbose()).str(blockName).str(action)) && alert(verbose) && shouldModifyPackets()) {
+            if (flagAndAlert(V.write(verbose()).str(blockName).str(action), verbose) && shouldModifyPackets()) {
                 didLastFlag = true;
                 blockBreak.cancel();
             } else {

@@ -66,7 +66,7 @@ public class BadPacketsH extends BlockPlaceCheck {
 
     private boolean flagSequence(int expected, int sequence) {
         String verbose = "expected=" + expected + ", id=" + sequence;
-        return flag(V.write(verbose()).zz(expected).zz(sequence)) && alert(verbose);
+        return flagAndAlert(V.write(verbose()).zz(expected).zz(sequence), verbose);
     }
 
     public void onWorldChange() {

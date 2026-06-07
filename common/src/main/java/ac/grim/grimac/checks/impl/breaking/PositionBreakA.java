@@ -61,7 +61,7 @@ public class PositionBreakA extends Check implements BlockBreakCheck {
             String action = String.valueOf(blockBreak.action);
             String face = String.valueOf(blockBreak.face);
             String verbose = "action=" + action + ", face=" + face;
-            if (flag(V.write(verbose()).str(action).str(face)) && alert(verbose) && shouldModifyPackets()) {
+            if (flagAndAlert(V.write(verbose()).str(action).str(face), verbose) && shouldModifyPackets()) {
                 blockBreak.cancel();
             }
         }

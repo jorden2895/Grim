@@ -45,7 +45,7 @@ public class MultiBreak extends Check implements BlockBreakCheck {
                     + ", pos=" + pos
                     + ", lastPos=" + previousPos;
             if (!player.canSkipTicks()) {
-                if (flag(V.write(verbose()).str(face).str(previousFace).str(pos).str(previousPos)) && alert(verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).str(face).str(previousFace).str(pos).str(previousPos), verbose) && shouldModifyPackets()) {
                     blockBreak.cancel();
                 }
             } else {
@@ -72,9 +72,7 @@ public class MultiBreak extends Check implements BlockBreakCheck {
         if (player.isTickingReliablyFor(3)) {
             for (FlagData data : flags) {
                 String verbose = data.verbose();
-                if (flag(V.write(verbose()).str(data.face()).str(data.previousFace()).str(data.pos()).str(data.previousPos()))) {
-                    alert(verbose);
-                }
+                flagAndAlert(V.write(verbose()).str(data.face()).str(data.previousFace()).str(data.pos()).str(data.previousPos()), verbose);
             }
         }
 

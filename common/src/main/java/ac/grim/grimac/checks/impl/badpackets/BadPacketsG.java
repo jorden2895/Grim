@@ -29,7 +29,7 @@ public class BadPacketsG extends Check implements PacketCheck {
                 if (lastSneaking && !respawn) {
                     boolean state = true;
                     String verbose = "state=" + state;
-                    if (flag(V.write(verbose()).bool(state)) && alert(verbose) && shouldModifyPackets()) {
+                    if (flagAndAlert(V.write(verbose()).bool(state), verbose) && shouldModifyPackets()) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }
@@ -41,7 +41,7 @@ public class BadPacketsG extends Check implements PacketCheck {
                 if (!lastSneaking && !respawn) {
                     boolean state = false;
                     String verbose = "state=" + state;
-                    if (flag(V.write(verbose()).bool(state)) && alert(verbose) && shouldModifyPackets()) {
+                    if (flagAndAlert(V.write(verbose()).bool(state), verbose) && shouldModifyPackets()) {
                         event.setCancelled(true);
                         player.onPacketCancel();
                     }

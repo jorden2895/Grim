@@ -238,9 +238,7 @@ public class Reach extends Check implements PacketCheck {
                     if (reachEntity instanceof PacketEntitySizeable sizeable) {
                         added += ", size=" + sizeable.size;
                     }
-                    if (flag(V.write(verbose()).f64(result.minDistance()).vi(reachEntity.getType().getId(player.getClientVersion())))) {
-                        alert(result.verbose() + added);
-                    }
+                    flagAndAlert(V.write(verbose()).f64(result.minDistance()).vi(reachEntity.getType().getId(player.getClientVersion())), result.verbose() + added);
                 }
                 case HITBOX -> {
                     String added = "type=" + reachEntity.getType().getName().getKey();

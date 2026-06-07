@@ -30,9 +30,7 @@ public class CrashH extends Check implements PacketCheck {
                     player.onPacketCancel();
                 }
                 String verbose = "(length) length=" + length;
-                if (flag(V.write(verbose()).bool(true).zz(length))) {
-                    alert(verbose);
-                }
+                flagAndAlert(V.write(verbose()).bool(true).zz(length), verbose);
                 return;
             }
             // paper's patch
@@ -43,9 +41,7 @@ public class CrashH extends Check implements PacketCheck {
                     player.onPacketCancel();
                 }
                 String verbose = "(invalid) length=" + length;
-                if (flag(V.write(verbose()).bool(false).zz(length))) {
-                    alert(verbose);
-                }
+                flagAndAlert(V.write(verbose()).bool(false).zz(length), verbose);
             }
         }
     }

@@ -23,7 +23,7 @@ public class BadPacketsY extends Check implements PacketCheck {
             final int slot = new WrapperPlayClientHeldItemChange(event).getSlot();
             if (slot > 8 || slot < 0) { // ban
                 String verbose = "slot=" + slot;
-                if (flag(V.write(verbose()).zz(slot)) && alert(verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).zz(slot), verbose) && shouldModifyPackets()) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }

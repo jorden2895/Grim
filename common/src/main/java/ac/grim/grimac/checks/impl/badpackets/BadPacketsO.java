@@ -48,7 +48,7 @@ public class BadPacketsO extends Check implements PacketCheck {
             }
 
             String verbose = "id=" + id;
-            if (flag(V.write(verbose()).str(Long.toString(id))) && alert(verbose) && shouldModifyPackets()) {
+            if (flagAndAlert(V.write(verbose()).str(Long.toString(id)), verbose) && shouldModifyPackets()) {
                 event.setCancelled(true);
                 player.onPacketCancel();
             }

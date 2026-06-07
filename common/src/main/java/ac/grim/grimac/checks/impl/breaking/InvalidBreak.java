@@ -27,7 +27,7 @@ public class InvalidBreak extends Check implements BlockBreakCheck {
             // ban
             String action = String.valueOf(blockBreak.action);
             String verbose = "face=" + blockBreak.faceId + ", action=" + action;
-            if (flag(V.write(verbose()).zz(blockBreak.faceId).str(action)) && alert(verbose) && shouldModifyPackets()) {
+            if (flagAndAlert(V.write(verbose()).zz(blockBreak.faceId).str(action), verbose) && shouldModifyPackets()) {
                 blockBreak.cancel();
             }
         }

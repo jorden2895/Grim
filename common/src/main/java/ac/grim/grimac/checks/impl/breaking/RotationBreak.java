@@ -45,7 +45,7 @@ public class RotationBreak extends Check implements BlockBreakCheck {
             // If the player hit and has flagged this check recently
             String action = String.valueOf(blockBreak.action);
             String verbose = "pre-flying, action=" + action;
-            if (flag(V.write(verbose()).bool(true).str(action)) && alert(verbose) && shouldModifyPackets()) {
+            if (flagAndAlert(V.write(verbose()).bool(true).str(action), verbose) && shouldModifyPackets()) {
                 blockBreak.cancel();
             }
         }
@@ -70,9 +70,7 @@ public class RotationBreak extends Check implements BlockBreakCheck {
             flagBuffer = 1;
             String action = String.valueOf(blockBreak.action);
             String verbose = "post-flying, action=" + action;
-            if (flag(V.write(verbose()).bool(false).str(action))) {
-                alert(verbose);
-            }
+            flagAndAlert(V.write(verbose()).bool(false).str(action), verbose);
         }
     }
 

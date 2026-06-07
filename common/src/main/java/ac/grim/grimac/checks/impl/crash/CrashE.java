@@ -24,9 +24,7 @@ public class CrashE extends Check implements PacketCheck {
             int viewDistance = wrapper.getViewDistance();
             if (viewDistance < 2) {
                 String verbose = "distance=" + viewDistance;
-                if (flag(V.write(verbose()).zz(viewDistance))) {
-                    alert(verbose);
-                }
+                flagAndAlert(V.write(verbose()).zz(viewDistance), verbose);
                 wrapper.setViewDistance(2);
             }
         }

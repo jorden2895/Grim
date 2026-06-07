@@ -33,10 +33,7 @@ public class GroundSpoof extends Check implements PostPredictionCheck {
 
         boolean claimed = player.clientClaimsLastOnGround;
         if (claimed != player.onGround) {
-            if (flag(V.write(verbose()).bool(claimed))) {
-                alert("claimed " + claimed);
-                setbackIfAboveSetbackVL();
-            }
+            flagAndAlertWithSetback(V.write(verbose()).bool(claimed), "claimed " + claimed);
             player.checkManager.getNoFall().flipPlayerGroundStatus = true;
         }
     }

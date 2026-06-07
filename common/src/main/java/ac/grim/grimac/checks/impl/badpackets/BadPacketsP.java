@@ -56,8 +56,8 @@ public class BadPacketsP extends Check implements PacketCheck {
                 boolean hasContainer = wrapper.getWindowId() == containerId;
                 String verbose = "clickType=" + clickTypeName + ", button=" + button
                         + (hasContainer ? ", container=" + containerType : "");
-                if (flag(V.write(verbose()).str(clickTypeName).zz(button).bool(hasContainer).zz(containerType))
-                        && alert(verbose) && shouldModifyPackets()) {
+                if (flagAndAlert(V.write(verbose()).str(clickTypeName).zz(button).bool(hasContainer).zz(containerType), verbose)
+                        && shouldModifyPackets()) {
                     event.setCancelled(true);
                     player.onPacketCancel();
                 }

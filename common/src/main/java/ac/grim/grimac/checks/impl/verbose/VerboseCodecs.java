@@ -52,6 +52,8 @@ public final class VerboseCodecs {
                 (in, ctx, out, fmt) -> out.append(entityTypeName(ctx.clientVersionPvn(), in.rvi())));
         VerboseTags.register("offset", List.of(VerboseSchema.TypeTag.F64),
                 (in, ctx, out, fmt) -> out.append(OffsetHandler.humanFormattedOffset(in.rf64())));
+        VerboseTags.register("stdnum", List.of(VerboseSchema.TypeTag.F64),
+                (in, ctx, out, fmt) -> out.append(formatNumberStandard(in.rf64())));
     }
 
     private VerboseCodecs() {
@@ -122,6 +124,18 @@ public final class VerboseCodecs {
     private static @NotNull String entityTypeName(int clientVersionPvn, int entityId) {
         EntityType entityType = EntityTypes.getById(ClientVersion.getById(clientVersionPvn), entityId);
         return entityType == null ? "unknown" : entityType.getName().getKey();
+    }
+
+    private static @NotNull String formatNumberStandard(double value) {
+        double abs = Math.abs(value);
+        if (abs < 1e-7) return "0";
+        String formatted;
+        if (abs < 0.001) {
+            formatted = String.format("%.4E", value);
+            return formatted.replace("E-0", "E-");
+        }
+        formatted = String.format("%6f", value);
+        return formatted.replace("0.", ".");
     }
 
 }

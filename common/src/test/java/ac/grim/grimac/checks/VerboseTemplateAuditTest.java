@@ -180,6 +180,7 @@ class VerboseTemplateAuditTest {
         tags.put("item", List.of(VerboseSchema.TypeTag.ZZ));
         tags.put("packet", List.of(VerboseSchema.TypeTag.ZZ));
         tags.put("offset", List.of(VerboseSchema.TypeTag.F64));
+        tags.put("stdnum", List.of(VerboseSchema.TypeTag.F64));
         return tags;
     }
 

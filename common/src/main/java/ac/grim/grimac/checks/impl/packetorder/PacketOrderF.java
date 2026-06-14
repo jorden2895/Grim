@@ -13,7 +13,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPl
 
 import java.util.ArrayDeque;
 
-@CheckData(name = "PacketOrderF", stableKey = "grim.packetorder.input_tick_to_sneak_sprint_order", experimental = true, verboseVersion = 1)
+@CheckData(name = "PacketOrderF", stableKey = "grim.packetorder.input_tick_to_sneak_sprint_order", verboseVersion = 1, description = "Sent action packets after sneak or sprint input in an invalid order", experimental = true)
 public class PacketOrderF extends Check implements PostPredictionCheck {
     public static final VerboseSchema V = VerboseSchema.of("action:vi", "sprinting:bool", "sneaking:bool");
 

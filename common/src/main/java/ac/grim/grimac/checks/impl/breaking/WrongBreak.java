@@ -16,7 +16,7 @@ import com.github.retrooper.packetevents.util.Vector3i;
 
 import static ac.grim.grimac.utils.nmsutil.BlockBreakSpeed.getBlockDamage;
 
-@CheckData(name = "WrongBreak", stableKey = "grim.breaking.wrong_break", verboseVersion = 2)
+@CheckData(name = "WrongBreak", stableKey = "grim.breaking.wrong_break", verboseVersion = 2, description = "Sent block break progress for a different block than the one being mined")
 public class WrongBreak extends Check implements BlockBreakCheck {
     public static final VerboseSchema V = VerboseSchema.of(2,
             "action:enum", "lastPosPresent:bool", "lastPosXZ:vl", "lastPosY:zz", "posXZ:vl", "posY:zz");

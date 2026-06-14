@@ -24,7 +24,7 @@ import java.util.Locale;
 
 import static com.github.retrooper.packetevents.protocol.packettype.PacketType.Play.Client.*;
 
-@CheckData(name = "Post", stableKey = "grim.post.invalid_order", verboseVersion = 1)
+@CheckData(name = "Post", stableKey = "grim.post.invalid_order", verboseVersion = 1, description = "Sent packets out of the expected movement tick order")
 public class Post extends Check implements PacketCheck, PostPredictionCheck {
     public static final VerboseSchema V = VerboseSchema.of("message:str");
 

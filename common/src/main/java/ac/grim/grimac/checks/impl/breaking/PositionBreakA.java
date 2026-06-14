@@ -11,7 +11,7 @@ import ac.grim.grimac.utils.collisions.datatypes.SimpleCollisionBox;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 
-@CheckData(name = "PositionBreakA", stableKey = "grim.breaking.position_break_a", verboseVersion = 2)
+@CheckData(name = "PositionBreakA", stableKey = "grim.breaking.position_break_a", verboseVersion = 2, description = "Tried to break a block face from an impossible eye position")
 public class PositionBreakA extends Check implements BlockBreakCheck {
     public static final VerboseSchema V = VerboseSchema.of(2, "action:enum", "face:enum");
 

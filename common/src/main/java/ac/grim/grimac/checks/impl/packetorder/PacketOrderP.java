@@ -12,7 +12,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBundle;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
-@CheckData(name = "PacketOrderP", stableKey = "grim.packetorder.transaction_response_order", experimental = true, verboseVersion = 2)
+@CheckData(name = "PacketOrderP", stableKey = "grim.packetorder.transaction_response_order", verboseVersion = 2, description = "Responded to chunk batch packets in an invalid transaction order", experimental = true)
 public class PacketOrderP extends Check implements PacketCheck {
     public static final VerboseSchema V = VerboseSchema.of(2, "kind:vi", "packetId:zz");
 

@@ -11,7 +11,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow.WindowClickType;
 
-@CheckData(name = "CrashF", stableKey = "grim.crash.button_crash", verboseVersion = 2)
+@CheckData(name = "CrashF", stableKey = "grim.crash.button_crash", verboseVersion = 2, description = "Sent an inventory click with an invalid button or slot value")
 public class CrashF extends Check implements PacketCheck {
     public static final VerboseSchema V = VerboseSchema.of(2,
             "clickType:enum", "button:zz", "hasSlot:bool", "slot:zz");

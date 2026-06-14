@@ -12,7 +12,7 @@ import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity.InteractAction;
 
-@CheckData(name = "PacketOrderD", stableKey = "grim.packetorder.interact_hand_order", experimental = true, verboseVersion = 1)
+@CheckData(name = "PacketOrderD", stableKey = "grim.packetorder.interact_hand_order", verboseVersion = 1, description = "Sent offhand entity interaction before the matching mainhand interaction", experimental = true)
 public class PacketOrderD extends Check implements PacketCheck {
     public static final VerboseSchema V = VerboseSchema.of(
             "kind:vi", "requiredEntity:zz", "entity:zz", "requiredSneaking:bool", "sneaking:bool");

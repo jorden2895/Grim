@@ -10,7 +10,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 
 import static com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying.isFlying;
 
-@CheckData(name = "TickTimer", stableKey = "grim.timer.tick", setback = 1, verboseVersion = 1)
+@CheckData(name = "TickTimer", stableKey = "grim.timer.tick", verboseVersion = 1, description = "Did not send client tick end packet", setback = 1)
 public class TickTimer extends Check implements PacketCheck {
     public static final VerboseSchema V = VerboseSchema.of("end:bool", "packets:vi");
 

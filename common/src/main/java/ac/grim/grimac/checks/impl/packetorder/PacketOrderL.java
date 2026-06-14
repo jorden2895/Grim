@@ -14,7 +14,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPl
 
 import java.util.ArrayDeque;
 
-@CheckData(name = "PacketOrderL", stableKey = "grim.packetorder.drop_item_order", experimental = true, verboseVersion = 1)
+@CheckData(name = "PacketOrderL", stableKey = "grim.packetorder.drop_item_order", verboseVersion = 1, description = "Sent drop, inventory open, or offhand swap packets in an invalid order", experimental = true)
 public class PacketOrderL extends Check implements PostPredictionCheck {
     public static final VerboseSchema V = VerboseSchema.of("action:vi");
 

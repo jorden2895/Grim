@@ -14,7 +14,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerKe
 
 import java.util.LinkedList;
 
-@CheckData(name = "BadPacketsO", stableKey = "grim.badpackets.invalid_keepalive", verboseVersion = 2)
+@CheckData(name = "BadPacketsO", stableKey = "grim.badpackets.invalid_keepalive", verboseVersion = 2, description = "Responded with a keepalive ID that was not sent by the server")
 public class BadPacketsO extends Check implements PacketCheck {
     public static final VerboseSchema V = VerboseSchema.of(2, "idHi:zz", "idLo:zz");
 

@@ -23,6 +23,7 @@ import ac.grim.grimac.predictionengine.PointThreeEstimator;
 import ac.grim.grimac.predictionengine.UncertaintyHandler;
 import ac.grim.grimac.manager.AttackCooldownHandler;
 import ac.grim.grimac.predictionengine.blockeffects.CompensatedGeysers;
+import ac.grim.grimac.predictionengine.blockeffects.PotentSulfurGeyser;
 import ac.grim.grimac.utils.anticheat.LogUtil;
 import ac.grim.grimac.utils.anticheat.MessageUtil;
 import ac.grim.grimac.utils.anticheat.update.BlockBreak;
@@ -366,6 +367,10 @@ public class GrimPlayer implements GrimUser {
             Vector3dm vector = clientVelocity.clone().setY(0.30000001192092896 + (canFloatWhileRidden ? 0.03999999910593033 : 0.0));
             if (getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_21_2)) {
                 Collisions.resolveBlockEffects(this, vector, true, finalMovementsThisTick);
+            }
+
+            if (getClientVersion().isNewerThanOrEquals(ClientVersion.V_26_2)) {
+                PotentSulfurGeyser.launchEntityTicker(this, vector, false);
             }
 
             possibleMovements.add(new VectorData(vector, VectorData.VectorType.Swimhop));

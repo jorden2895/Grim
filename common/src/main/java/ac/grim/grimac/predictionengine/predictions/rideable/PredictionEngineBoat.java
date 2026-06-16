@@ -191,7 +191,7 @@ public class PredictionEngineBoat extends PredictionEngine {
         // yes, this is how mojank does it
         Collisions.applyEffectsFromBlocks(player);
         Collisions.applyEffectsFromBlocks(player);
-        PotentSulfurGeyser.launchEntityTicker(player);
+        PotentSulfurGeyser.launchEntityTicker(player, player.clientVelocity, true);
     }
 
     @Override

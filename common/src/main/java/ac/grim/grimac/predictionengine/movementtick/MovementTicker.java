@@ -504,7 +504,7 @@ public class MovementTicker {
         }
 
         Collisions.applyEffectsFromBlocks(player);
-        PotentSulfurGeyser.launchEntityTicker(player);
+        PotentSulfurGeyser.launchEntityTicker(player, player.clientVelocity, true);
     }
 
     private boolean canFloatWhileRidden() {

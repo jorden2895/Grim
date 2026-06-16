@@ -6,8 +6,11 @@ import ac.grim.grimac.utils.collisions.datatypes.CollisionBox;
 import ac.grim.grimac.utils.collisions.datatypes.SimpleCollisionBox;
 import ac.grim.grimac.utils.data.packetentity.PacketEntity;
 import ac.grim.grimac.utils.math.GrimMath;
+import ac.grim.grimac.utils.math.Vector3dm;
 import ac.grim.grimac.utils.nmsutil.EntityTypeTags;
 import ac.grim.grimac.utils.nmsutil.Materials;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState;
@@ -21,8 +24,10 @@ import java.util.List;
 @UtilityClass
 public class PotentSulfurGeyser {
 
-    public static void launchEntityTicker(GrimPlayer player) {
-        if (player.getClientVersion().isOlderThan(ClientVersion.V_26_2)) {
+    private static final boolean HAS_GEYSERS = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_26_2);
+
+    public static void launchEntityTicker(GrimPlayer player, Vector3dm clientVelocity, boolean checkFallDistanceAccumulation) {
+        if (player.getClientVersion().isOlderThan(ClientVersion.V_26_2) || !HAS_GEYSERS) {
             return;
         }
 
@@ -40,10 +45,10 @@ public class PotentSulfurGeyser {
             return;
         }
 
-        launchFromPotentSulfurGeysers(player);
+        launchFromPotentSulfurGeysers(player, clientVelocity, checkFallDistanceAccumulation);
     }
 
-    private static void launchFromPotentSulfurGeysers(GrimPlayer player) {
+    private static void launchFromPotentSulfurGeysers(GrimPlayer player, Vector3dm clientVelocity, boolean checkFallDistanceAccumulation) {
         SimpleCollisionBox box = player.boundingBox;
 
         int minX = GrimMath.floor(box.minX);
@@ -80,9 +85,10 @@ public class PotentSulfurGeyser {
             int waterBlocks = sourceBlock.y - y - 1;
             int geyserForceHeight = getUnobstructedBlockCount(player, x, y + 1, z, waterBlocks);
             if (geyserForceHeight > 0 && box.isIntersected(new SimpleCollisionBox(x, y + 1, z).expandMax(0.0, geyserForceHeight - 1.0, 0.0))) {
-                checkFallDistanceAccumulation(player);
-                if (player.clientVelocity.getY() < 0.3F + waterBlocks * 0.1F) {
-                    player.clientVelocity.add(0.0, 0.2F, 0.0);
+                if (checkFallDistanceAccumulation)
+                    checkFallDistanceAccumulation(player, clientVelocity);
+                if (clientVelocity.getY() < 0.3F + waterBlocks * 0.1F) {
+                    clientVelocity.add(0.0, 0.2F, 0.0);
                 }
             }
         }
@@ -150,8 +156,8 @@ public class PotentSulfurGeyser {
         return potentSulfurState == PotentSulfurState.ERUPTING || potentSulfurState == PotentSulfurState.CONTINUOUS;
     }
 
-    private static void checkFallDistanceAccumulation(GrimPlayer player) {
-        if (player.clientVelocity.getY() > -0.5 && player.fallDistance > 1.0) {
+    private static void checkFallDistanceAccumulation(GrimPlayer player, Vector3dm clientVelocity) {
+        if (clientVelocity.getY() > -0.5 && player.fallDistance > 1.0) {
             player.fallDistance = 1.0;
         }
     }

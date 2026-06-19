@@ -78,7 +78,7 @@ public final class BoundingBoxSize {
             return 0.85f;
         } else if (type == EntityTypes.IRON_GOLEM) {
             return 1.4f;
-        } else if (type == EntityTypes.SULFUR_CUBE) { // TODO: viaversion
+        } else if (type == EntityTypes.SULFUR_CUBE && player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_26_2)) {
             if (packetEntity instanceof PacketEntitySizeable sizeable) {
                 return 0.49f * sizeable.size;
             }
@@ -104,7 +104,7 @@ public final class BoundingBoxSize {
             return 1.95f;
         } else if (type == EntityTypes.SHULKER) {
             return 1f;
-        } else if (type == EntityTypes.SLIME) {
+        } else if (type == EntityTypes.SLIME || (player.getClientVersion().isOlderThan(ClientVersion.V_26_2) && type == EntityTypes.SULFUR_CUBE)) {
             if (packetEntity instanceof PacketEntitySizeable sizeable) {
                 float size = sizeable.size;
                 return player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_20_5)
@@ -326,7 +326,7 @@ public final class BoundingBoxSize {
             return 1.87f;
         } else if (type == EntityTypes.TROPICAL_FISH) {
             return 0.4f;
-        } else if (type == EntityTypes.SULFUR_CUBE) { // TODO: viaversion
+        } else if (type == EntityTypes.SULFUR_CUBE && player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_26_2)) {
             if (packetEntity instanceof PacketEntitySizeable sizeable) {
                 return 0.49f * sizeable.size;
             }
@@ -381,7 +381,7 @@ public final class BoundingBoxSize {
             return player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_9) ? 1.99f : 1.95f;
         } else if (type == EntityTypes.SKELETON_HORSE) {
             return 1.6f;
-        } else if (type == EntityTypes.SLIME) {
+        } else if (type == EntityTypes.SLIME || (player.getClientVersion().isOlderThan(ClientVersion.V_26_2) && type == EntityTypes.SULFUR_CUBE)) {
             if (packetEntity instanceof PacketEntitySizeable sizeable) {
                 float size = sizeable.size;
                 return player.getClientVersion().isNewerThanOrEquals(ClientVersion.V_1_20_5)

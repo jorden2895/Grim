@@ -29,6 +29,12 @@ body:
     validations:
       required: true
 
+  - type: textarea
+    attributes:
+      label: Client version
+      description: |
+        If applicable, provide both the client type (ie vanilla, Fabric, Lunar, etc) & the Minecraft version. Prefer vanilla clients where possible.
+
   - type: dropdown
     id: type
     attributes:
